@@ -1,0 +1,3120 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Content Engine — Grow Your Cashflow</title>
+<link href="https://fonts.googleapis.com/css2?family=DM+Serif+Display&family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=Source+Sans+3:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+<script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.7/dist/chart.umd.min.js"></script>
+<style>
+  :root {
+    --green-primary: #51BE7B;
+    --green-accent: #40E47F;
+    --green-soft: #32C583;
+    --green-hover: #45A86C;
+    --teal-deep: #1F5159;
+    --teal-mid: #194147;
+    --teal-midnight: #0A1E21;
+    --mint-bg: #E7F5F0;
+    --off-white: #FAF9F5;
+    --charcoal: #141413;
+    --slate: #607179;
+    --bg: #F4F7F6;
+    --surface: #FFFFFF;
+    --surface2: var(--mint-bg);
+    --border: #D5E0DC;
+    --text: var(--charcoal);
+    --text-dim: var(--slate);
+    --accent: var(--teal-deep);
+    --red: #D94444;
+    --red-dim: rgba(217,68,68,.08);
+    --orange: #D48A30;
+    --orange-dim: rgba(212,138,48,.08);
+    --green: var(--green-primary);
+    --green-dim: rgba(81,190,123,.10);
+    --yellow: #C9A820;
+    --purple: #8B5FC7;
+    --font-headline: 'DM Serif Display', Georgia, serif;
+    --font-ui: 'Plus Jakarta Sans', -apple-system, sans-serif;
+    --font-body: 'Source Sans 3', 'Source Sans Pro', sans-serif;
+    --radius: 14px;
+    --radius-sm: 10px;
+  }
+
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  body { font-family: var(--font-body); color: var(--text); background: var(--bg); line-height: 1.5; }
+
+  /* ─── LAYOUT ─── */
+  .app { display: flex; min-height: 100vh; }
+  .sidebar {
+    width: 260px; min-width: 260px;
+    background: var(--teal-midnight);
+    color: white;
+    padding: 24px 0;
+    display: flex; flex-direction: column;
+    position: sticky; top: 0; height: 100vh;
+    overflow-y: auto;
+  }
+  .sidebar-logo {
+    font-family: var(--font-headline);
+    font-size: 20px;
+    padding: 0 24px 4px;
+    color: white;
+  }
+  .sidebar-sub {
+    font-family: var(--font-ui);
+    font-size: 10px;
+    font-weight: 700;
+    letter-spacing: 2px;
+    text-transform: uppercase;
+    color: var(--green-accent);
+    padding: 0 24px 24px;
+  }
+  .sidebar-section {
+    font-family: var(--font-ui);
+    font-size: 10px;
+    font-weight: 700;
+    letter-spacing: 2px;
+    text-transform: uppercase;
+    color: rgba(255,255,255,0.35);
+    padding: 20px 24px 8px;
+  }
+  .sidebar-link {
+    display: flex; align-items: center; gap: 10px;
+    padding: 10px 24px;
+    font-family: var(--font-ui);
+    font-size: 13px;
+    font-weight: 500;
+    color: rgba(255,255,255,0.6);
+    cursor: pointer;
+    transition: all 0.15s;
+    text-decoration: none;
+  }
+  .sidebar-link:hover { color: white; background: rgba(255,255,255,0.05); }
+  .sidebar-link.active { color: white; background: rgba(81,190,123,0.15); border-right: 3px solid var(--green-accent); }
+  .sidebar-link .icon { font-size: 16px; width: 20px; text-align: center; }
+  .sidebar-spacer { flex: 1; }
+  .sidebar-config {
+    padding: 16px 24px;
+    border-top: 1px solid rgba(255,255,255,0.08);
+  }
+  .sidebar-config label {
+    font-family: var(--font-ui);
+    font-size: 11px;
+    font-weight: 600;
+    color: rgba(255,255,255,0.4);
+    display: block;
+    margin-bottom: 6px;
+  }
+  .sidebar-config input {
+    width: 100%;
+    background: rgba(255,255,255,0.06);
+    border: 1px solid rgba(255,255,255,0.1);
+    border-radius: 6px;
+    padding: 8px 10px;
+    color: white;
+    font-family: var(--font-ui);
+    font-size: 12px;
+    margin-bottom: 10px;
+    outline: none;
+  }
+  .sidebar-config input:focus { border-color: var(--green-accent); }
+  .sidebar-config .save-btn {
+    width: 100%;
+    background: var(--green-primary);
+    color: white;
+    border: none;
+    border-radius: 6px;
+    padding: 8px;
+    font-family: var(--font-ui);
+    font-size: 12px;
+    font-weight: 700;
+    cursor: pointer;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+  }
+  .sidebar-config .save-btn:hover { background: var(--green-hover); }
+  .sidebar-status {
+    padding: 8px 24px 0;
+    font-family: var(--font-ui);
+    font-size: 10px;
+    color: rgba(255,255,255,0.25);
+  }
+  .sidebar-status .dot {
+    display: inline-block; width: 6px; height: 6px;
+    border-radius: 50%; margin-right: 4px; vertical-align: middle;
+  }
+  .dot-ok { background: var(--green-accent); }
+  .dot-off { background: var(--red); }
+
+  .main { flex: 1; padding: 32px; max-width: calc(100vw - 260px); }
+
+  /* ─── HEADER ─── */
+  .header {
+    display: flex; justify-content: space-between; align-items: center;
+    margin-bottom: 28px;
+  }
+  .header-left h1 {
+    font-family: var(--font-headline);
+    font-size: 28px;
+    font-weight: 400;
+    color: var(--teal-midnight);
+  }
+  .header-left .subtitle {
+    font-family: var(--font-ui);
+    font-size: 12px;
+    color: var(--text-dim);
+    margin-top: 2px;
+  }
+  .header-actions { display: flex; gap: 10px; align-items: center; }
+  .btn {
+    display: inline-flex; align-items: center; gap: 6px;
+    padding: 10px 20px;
+    border-radius: 8px;
+    font-family: var(--font-ui);
+    font-size: 12px;
+    font-weight: 700;
+    letter-spacing: 0.5px;
+    text-transform: uppercase;
+    cursor: pointer;
+    border: none;
+    transition: all 0.15s;
+    text-decoration: none;
+  }
+  .btn-primary { background: var(--green-primary); color: white; }
+  .btn-primary:hover { background: var(--green-hover); transform: translateY(-1px); box-shadow: 0 4px 16px rgba(81,190,123,0.3); }
+  .btn-outline { background: transparent; color: var(--accent); border: 2px solid var(--border); }
+  .btn-outline:hover { border-color: var(--accent); }
+  .btn-sm { padding: 7px 14px; font-size: 11px; }
+  .btn-ghost { background: transparent; color: var(--text-dim); border: 1px solid var(--border); }
+  .btn-ghost:hover { border-color: var(--accent); color: var(--accent); }
+
+  /* ─── TABS ─── */
+  .tabs {
+    display: flex; gap: 0; border-bottom: 2px solid var(--border);
+    margin-bottom: 24px;
+  }
+  .tab {
+    padding: 10px 20px;
+    font-family: var(--font-ui);
+    font-size: 13px;
+    font-weight: 600;
+    color: var(--text-dim);
+    cursor: pointer;
+    border-bottom: 2px solid transparent;
+    margin-bottom: -2px;
+    transition: all 0.15s;
+  }
+  .tab:hover { color: var(--text); }
+  .tab.active { color: var(--green-primary); border-bottom-color: var(--green-primary); }
+
+  .tab-panel { display: none; }
+  .tab-panel.active { display: block; }
+
+  /* ─── CARDS ─── */
+  .card {
+    background: var(--surface);
+    border-radius: var(--radius);
+    border: 1px solid var(--border);
+    padding: 24px;
+    margin-bottom: 20px;
+  }
+  .card-header {
+    display: flex; justify-content: space-between; align-items: center;
+    margin-bottom: 16px;
+  }
+  .card-title {
+    font-family: var(--font-ui);
+    font-size: 14px;
+    font-weight: 700;
+    color: var(--text);
+  }
+  .card-badge {
+    font-family: var(--font-ui);
+    font-size: 10px;
+    font-weight: 700;
+    letter-spacing: 1px;
+    text-transform: uppercase;
+    padding: 4px 10px;
+    border-radius: 20px;
+    background: var(--green-dim);
+    color: var(--green-primary);
+  }
+
+  /* ─── KPI ROW ─── */
+  .kpi-row {
+    display: grid;
+    grid-template-columns: repeat(6, 1fr);
+    gap: 16px;
+    margin-bottom: 24px;
+  }
+  .kpi {
+    background: var(--surface);
+    border-radius: var(--radius);
+    border: 1px solid var(--border);
+    padding: 20px;
+    text-align: center;
+  }
+  .kpi-label {
+    font-family: var(--font-ui);
+    font-size: 10px;
+    font-weight: 700;
+    letter-spacing: 1.5px;
+    text-transform: uppercase;
+    color: var(--text-dim);
+    margin-bottom: 6px;
+  }
+  .kpi-value {
+    font-family: var(--font-ui);
+    font-size: 28px;
+    font-weight: 800;
+    color: var(--teal-midnight);
+  }
+  .kpi-delta {
+    font-family: var(--font-ui);
+    font-size: 11px;
+    font-weight: 600;
+    margin-top: 4px;
+  }
+  .kpi-delta.up { color: var(--green-primary); }
+  .kpi-delta.down { color: var(--red); }
+  .kpi-source {
+    font-family: var(--font-ui);
+    font-size: 9px;
+    color: rgba(96,113,121,0.5);
+    margin-top: 6px;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+  }
+
+  /* ─── PIPELINE TABLE ─── */
+  .pipeline-table-wrap {
+    overflow-x: auto;
+    -webkit-overflow-scrolling: touch;
+  }
+  .pipeline-table {
+    width: 100%;
+    border-collapse: collapse;
+    font-family: var(--font-ui);
+    font-size: 13px;
+    min-width: 900px;
+  }
+  .pipeline-table th {
+    text-align: left;
+    padding: 8px 10px;
+    font-size: 10px;
+    font-weight: 700;
+    letter-spacing: 1.2px;
+    text-transform: uppercase;
+    color: var(--text-dim);
+    border-bottom: 2px solid var(--border);
+    white-space: nowrap;
+    position: sticky;
+    top: 0;
+    background: var(--bg);
+    z-index: 1;
+  }
+  .pipeline-table td {
+    padding: 8px 10px;
+    border-bottom: 1px solid var(--border);
+    vertical-align: middle;
+  }
+  .pipeline-table tr:hover { background: rgba(81,190,123,0.04); }
+  .pipeline-table tr:last-child td { border-bottom: none; }
+  .pipeline-thumb {
+    width: 44px;
+    height: 44px;
+    border-radius: 6px;
+    object-fit: cover;
+    background: var(--border);
+  }
+  .pipeline-thumb-placeholder {
+    width: 44px;
+    height: 44px;
+    border-radius: 6px;
+    background: var(--border);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 18px;
+    color: var(--text-dim);
+  }
+  .pipeline-ready-icon {
+    width: 20px;
+    height: 20px;
+    border-radius: 50%;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 11px;
+  }
+  .pipeline-ready-yes {
+    background: var(--green-dim);
+    color: var(--green-primary);
+  }
+  .pipeline-ready-no {
+    background: rgba(201,168,32,0.1);
+    color: var(--yellow);
+  }
+  .pipeline-actions {
+    display: flex;
+    gap: 4px;
+    align-items: center;
+  }
+  .pipeline-actions .btn {
+    padding: 4px 8px;
+    font-size: 10px;
+    white-space: nowrap;
+  }
+  .status-badge {
+    display: inline-block;
+    padding: 3px 10px;
+    border-radius: 20px;
+    font-size: 10px;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    white-space: nowrap;
+  }
+  .status-done { background: var(--green-dim); color: var(--green-primary); }
+  .status-review { background: var(--orange-dim); color: var(--orange); }
+  .status-script { background: rgba(139,95,199,0.1); color: var(--purple); }
+  .status-record { background: rgba(31,81,89,0.08); color: var(--accent); }
+  .status-scheduled { background: rgba(24,139,246,0.1); color: #188BF6; }
+  .status-idea { background: rgba(201,168,32,0.1); color: var(--yellow); }
+  .status-publish { background: rgba(24,139,246,0.1); color: #188BF6; }
+  .status-edit { background: rgba(139,95,199,0.1); color: var(--purple); }
+
+  /* ─── CONTENT GRID ─── */
+  .content-grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 16px;
+  }
+  .content-card {
+    background: var(--surface);
+    border-radius: var(--radius-sm);
+    border: 1px solid var(--border);
+    padding: 20px;
+    cursor: pointer;
+    transition: all 0.15s;
+  }
+  .content-card:hover { border-color: var(--green-primary); transform: translateY(-2px); box-shadow: 0 4px 20px rgba(0,0,0,0.06); }
+  .content-card .cc-type {
+    font-family: var(--font-ui);
+    font-size: 10px;
+    font-weight: 700;
+    letter-spacing: 1px;
+    text-transform: uppercase;
+    color: var(--green-primary);
+    margin-bottom: 8px;
+  }
+  .content-card .cc-title {
+    font-family: var(--font-ui);
+    font-size: 14px;
+    font-weight: 700;
+    color: var(--text);
+    margin-bottom: 6px;
+    line-height: 1.3;
+  }
+  .content-card .cc-meta {
+    font-family: var(--font-ui);
+    font-size: 11px;
+    color: var(--text-dim);
+  }
+  .content-card .cc-stats {
+    display: flex; gap: 12px;
+    margin-top: 10px;
+    font-family: var(--font-ui);
+    font-size: 11px;
+    color: var(--text-dim);
+  }
+  .content-card .cc-stats span { display: flex; align-items: center; gap: 3px; }
+
+  /* ─── INSPIRATION / SWIPE FILE ─── */
+  .swipe-grid {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 16px;
+  }
+  .swipe-card {
+    background: var(--surface);
+    border-radius: var(--radius-sm);
+    border: 1px solid var(--border);
+    padding: 20px;
+    position: relative;
+  }
+  .swipe-card .pin-btn {
+    position: absolute; top: 12px; right: 12px;
+    background: none; border: none; cursor: pointer;
+    font-size: 16px; color: var(--text-dim);
+  }
+  .swipe-card .pin-btn.pinned { color: var(--green-primary); }
+  .swipe-card .author {
+    font-family: var(--font-ui);
+    font-size: 12px;
+    font-weight: 700;
+    color: var(--accent);
+    margin-bottom: 4px;
+  }
+  .swipe-card .author-handle {
+    font-family: var(--font-ui);
+    font-size: 11px;
+    color: var(--text-dim);
+    margin-bottom: 10px;
+  }
+  .swipe-card .swipe-text {
+    font-family: var(--font-body);
+    font-size: 13px;
+    color: var(--text);
+    line-height: 1.55;
+    border-left: 3px solid var(--green-primary);
+    padding-left: 12px;
+  }
+  .swipe-card .swipe-tags {
+    display: flex; gap: 6px; flex-wrap: wrap;
+    margin-top: 10px;
+  }
+  .swipe-tag {
+    font-family: var(--font-ui);
+    font-size: 10px;
+    font-weight: 600;
+    padding: 3px 8px;
+    border-radius: 4px;
+    background: var(--mint-bg);
+    color: var(--accent);
+  }
+
+  /* ─── FUNNEL METRICS ─── */
+  .funnel-flow {
+    display: flex;
+    align-items: center;
+    gap: 0;
+    margin: 20px 0;
+  }
+  .funnel-stage {
+    flex: 1;
+    text-align: center;
+    padding: 24px 16px;
+    background: var(--surface);
+    border: 1px solid var(--border);
+    position: relative;
+  }
+  .funnel-stage:first-child { border-radius: var(--radius) 0 0 var(--radius); }
+  .funnel-stage:last-child { border-radius: 0 var(--radius) var(--radius) 0; }
+  .funnel-stage .fs-label {
+    font-family: var(--font-ui);
+    font-size: 10px;
+    font-weight: 700;
+    letter-spacing: 1.5px;
+    text-transform: uppercase;
+    color: var(--text-dim);
+    margin-bottom: 6px;
+  }
+  .funnel-stage .fs-value {
+    font-family: var(--font-ui);
+    font-size: 24px;
+    font-weight: 800;
+    color: var(--teal-midnight);
+  }
+  .funnel-stage .fs-rate {
+    font-family: var(--font-ui);
+    font-size: 11px;
+    font-weight: 600;
+    color: var(--green-primary);
+    margin-top: 4px;
+  }
+  .funnel-arrow {
+    font-size: 20px;
+    color: var(--green-primary);
+    padding: 0 4px;
+    flex-shrink: 0;
+  }
+
+  /* ─── COMPOSE PANEL ─── */
+  .compose-panel {
+    display: grid;
+    grid-template-columns: 1fr 360px;
+    gap: 20px;
+  }
+  .compose-editor {
+    background: var(--surface);
+    border-radius: var(--radius);
+    border: 1px solid var(--border);
+    padding: 24px;
+  }
+  .compose-editor textarea {
+    width: 100%;
+    min-height: 300px;
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    padding: 16px;
+    font-family: var(--font-body);
+    font-size: 15px;
+    line-height: 1.7;
+    color: var(--text);
+    resize: vertical;
+    outline: none;
+  }
+  .compose-editor textarea:focus { border-color: var(--green-primary); }
+  .compose-sidebar {
+    display: flex; flex-direction: column; gap: 16px;
+    max-height: 80vh; overflow-y: auto; position: sticky; top: 32px;
+  }
+  .compose-sidebar .card { margin-bottom: 0; }
+  .transcript-list {
+    max-height: 200px;
+    overflow-y: auto;
+  }
+  .transcript-item {
+    padding: 10px 12px;
+    border-bottom: 1px solid var(--border);
+    cursor: pointer;
+    transition: background 0.1s;
+    font-family: var(--font-ui);
+    font-size: 12px;
+  }
+  .transcript-item:hover { background: var(--green-dim); }
+  .transcript-item.selected { background: var(--green-dim); border-left: 3px solid var(--green-primary); }
+  .transcript-item:last-child { border-bottom: none; }
+  .transcript-item .ti-title { font-weight: 700; color: var(--text); margin-bottom: 2px; }
+  .transcript-item .ti-date { color: var(--text-dim); font-size: 11px; }
+  .transcript-snippet {
+    font-family: var(--font-body);
+    font-size: 13px;
+    color: var(--text);
+    line-height: 1.6;
+    padding: 12px;
+    background: var(--off-white);
+    border-radius: 8px;
+    max-height: 200px;
+    overflow-y: auto;
+    white-space: pre-wrap;
+  }
+
+  /* ─── TOP HITS ─── */
+  .top-hits-row {
+    display: flex; gap: 16px; margin-bottom: 20px;
+  }
+  .top-hit-card {
+    flex: 1;
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    padding: 16px;
+    cursor: pointer;
+    transition: all 0.15s;
+    position: relative;
+    overflow: hidden;
+  }
+  .top-hit-card:hover { border-color: var(--green-primary); box-shadow: 0 4px 16px rgba(81,190,123,0.12); transform: translateY(-2px); }
+  .top-hit-card.selected { border-color: var(--green-primary); background: var(--green-dim); }
+  .top-hit-card .th-rank {
+    position: absolute; top: 10px; right: 10px;
+    background: var(--green-primary); color: white;
+    font-family: var(--font-ui); font-size: 10px; font-weight: 800;
+    width: 24px; height: 24px; border-radius: 50%;
+    display: flex; align-items: center; justify-content: center;
+  }
+  .top-hit-card .th-preview {
+    background: linear-gradient(135deg, var(--teal-midnight), var(--teal-deep));
+    border-radius: 8px; padding: 14px; margin-bottom: 12px;
+    color: white; font-family: var(--font-body); font-size: 12px; line-height: 1.5;
+    min-height: 80px; display: flex; align-items: flex-start;
+  }
+  .top-hit-card .th-stats {
+    display: flex; gap: 12px; font-family: var(--font-ui); font-size: 11px; color: var(--text-dim);
+  }
+  .top-hit-card .th-stats span { display: flex; align-items: center; gap: 3px; }
+  .top-hit-card .th-stats .stat-val { font-weight: 700; color: var(--text); }
+  .top-hit-card .th-title {
+    font-family: var(--font-ui); font-size: 13px; font-weight: 700; margin-bottom: 6px;
+    white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
+  }
+
+  /* ─── STYLE PICKER ─── */
+  .style-picker-grid {
+    display: grid; grid-template-columns: 1fr 1fr; gap: 8px;
+  }
+  .style-card {
+    padding: 10px 12px; border: 1px solid var(--border); border-radius: 8px;
+    cursor: pointer; transition: all 0.12s; font-family: var(--font-ui); font-size: 12px;
+  }
+  .style-card:hover { border-color: var(--green-primary); background: var(--green-dim); }
+  .style-card.selected { border-color: var(--green-primary); background: var(--green-dim); }
+  .style-card .sc-author { font-weight: 700; margin-bottom: 2px; }
+  .style-card .sc-snippet { color: var(--text-dim); font-size: 11px; line-height: 1.3; }
+
+  /* ─── TEMPLATE PICKER ─── */
+  .template-chips {
+    display: flex; flex-wrap: wrap; gap: 8px;
+  }
+  .template-chip {
+    padding: 6px 14px; border: 1px solid var(--border); border-radius: 20px;
+    font-family: var(--font-ui); font-size: 12px; font-weight: 600;
+    cursor: pointer; transition: all 0.12s; background: var(--surface);
+  }
+  .template-chip:hover { border-color: var(--green-primary); color: var(--green-primary); }
+  .template-chip.selected { background: var(--green-primary); color: white; border-color: var(--green-primary); }
+
+  /* ─── GENERATED OUTPUT ─── */
+  .generated-output {
+    background: var(--off-white); border: 1px solid var(--border); border-radius: var(--radius);
+    padding: 24px; margin-top: 16px; display: none;
+  }
+  .generated-output.visible { display: block; }
+  .go-section { margin-bottom: 16px; }
+  .go-section:last-child { margin-bottom: 0; }
+  .go-label {
+    font-family: var(--font-ui); font-size: 11px; font-weight: 700;
+    text-transform: uppercase; letter-spacing: 1px; color: var(--text-dim); margin-bottom: 6px;
+  }
+  .go-highlight {
+    display: inline-flex; align-items: center; gap: 6px;
+    padding: 6px 12px; border-radius: 6px; font-family: var(--font-ui); font-size: 13px; font-weight: 600;
+  }
+  .go-highlight.cta { background: rgba(81,190,123,0.12); color: #2D8A50; }
+  .go-highlight.value { background: rgba(31,81,89,0.08); color: var(--teal-deep); }
+  .go-highlight.image { background: rgba(212,138,48,0.08); color: var(--orange); }
+
+  /* ─── TOP HITS MODAL ─── */
+  .top-hits-modal {
+    display: none; position: fixed; inset: 0; z-index: 200;
+    background: rgba(0,0,0,0.5); align-items: center; justify-content: center;
+  }
+  .top-hits-modal.show { display: flex; }
+  .top-hits-modal-content {
+    background: var(--surface); border-radius: var(--radius);
+    width: 90%; max-width: 900px; max-height: 80vh; overflow-y: auto;
+    padding: 32px; position: relative;
+  }
+  .top-hits-modal-content .close-btn {
+    position: absolute; top: 16px; right: 16px;
+    background: none; border: none; font-size: 20px; cursor: pointer; color: var(--text-dim);
+  }
+  .top-hits-grid {
+    display: grid; grid-template-columns: repeat(auto-fill, minmax(280px, 1fr)); gap: 16px; margin-top: 16px;
+  }
+
+  /* ─── CHART CONTAINER ─── */
+  .chart-row {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 20px;
+    margin-bottom: 20px;
+  }
+  .chart-container { position: relative; height: 220px; }
+
+  /* ─── LOADING ─── */
+  .loading {
+    display: flex; align-items: center; justify-content: center;
+    padding: 40px;
+    color: var(--text-dim);
+    font-family: var(--font-ui);
+    font-size: 13px;
+  }
+  .spinner {
+    width: 20px; height: 20px;
+    border: 2px solid var(--border);
+    border-top-color: var(--green-primary);
+    border-radius: 50%;
+    animation: spin 0.6s linear infinite;
+    margin-right: 10px;
+  }
+  @keyframes spin { to { transform: rotate(360deg); } }
+
+  /* ─── MODAL ─── */
+  .modal-overlay {
+    display: none;
+    position: fixed; inset: 0;
+    background: rgba(10,30,33,0.6);
+    z-index: 100;
+    align-items: center; justify-content: center;
+  }
+  .modal-overlay.show { display: flex; }
+  .modal {
+    background: var(--surface);
+    border-radius: var(--radius);
+    padding: 32px;
+    max-width: 600px; width: 90%;
+    max-height: 80vh;
+    overflow-y: auto;
+  }
+  .modal h2 {
+    font-family: var(--font-headline);
+    font-size: 24px;
+    margin-bottom: 16px;
+  }
+  .modal .form-group { margin-bottom: 16px; }
+  .modal label {
+    font-family: var(--font-ui);
+    font-size: 12px;
+    font-weight: 700;
+    color: var(--text-dim);
+    display: block;
+    margin-bottom: 6px;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+  }
+  .modal input, .modal textarea, .modal select {
+    width: 100%;
+    padding: 10px 12px;
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    font-family: var(--font-body);
+    font-size: 14px;
+    color: var(--text);
+    outline: none;
+  }
+  .modal input:focus, .modal textarea:focus { border-color: var(--green-primary); }
+  .modal .modal-actions { display: flex; gap: 10px; justify-content: flex-end; margin-top: 20px; }
+
+  /* ─── EMPTY STATE ─── */
+  .empty-state {
+    text-align: center;
+    padding: 60px 20px;
+    color: var(--text-dim);
+  }
+  .empty-state .icon { font-size: 40px; margin-bottom: 12px; }
+  .empty-state p { font-family: var(--font-ui); font-size: 14px; }
+
+  /* ─── RESPONSIVE ─── */
+  @media (max-width: 1200px) {
+    .kpi-row { grid-template-columns: repeat(3, 1fr); }
+    .content-grid { grid-template-columns: repeat(2, 1fr); }
+    .compose-panel { grid-template-columns: 1fr; }
+  }
+  @media (max-width: 768px) {
+    .sidebar { display: none; }
+    .main { max-width: 100vw; padding: 20px; }
+    .kpi-row { grid-template-columns: repeat(2, 1fr); }
+    .content-grid { grid-template-columns: 1fr; }
+    .chart-row { grid-template-columns: 1fr; }
+    .funnel-flow { flex-direction: column; }
+    .funnel-arrow { transform: rotate(90deg); }
+  }
+</style>
+</head>
+<body>
+
+<div class="app">
+  <!-- ═══ SIDEBAR ═══ -->
+  <aside class="sidebar">
+    <div class="sidebar-logo">Grow Your Cashflow</div>
+    <div class="sidebar-sub">Content Engine</div>
+
+    <div class="sidebar-section">Dashboard</div>
+    <a class="sidebar-link active" data-tab="overview"><span class="icon">📊</span> Overview</a>
+    <a class="sidebar-link" data-tab="pipeline"><span class="icon">📝</span> Content Pipeline</a>
+    <a class="sidebar-link" data-tab="compose"><span class="icon">✍️</span> Create Post</a>
+    <a class="sidebar-link" data-tab="swipe"><span class="icon">📌</span> Swipe File</a>
+    <a class="sidebar-link" data-tab="funnel"><span class="icon">📈</span> Funnel Metrics</a>
+    <a class="sidebar-link" data-tab="analytics"><span class="icon">🔍</span> Analytics</a>
+
+    <div class="sidebar-spacer"></div>
+
+    <div class="sidebar-status" id="connectionStatus">
+      <span class="dot dot-off"></span> Not connected
+    </div>
+
+    <div class="sidebar-config">
+      <label>Airtable API Key</label>
+      <input type="password" id="airtableKey" placeholder="pat..." />
+      <label>Airtable Base ID</label>
+      <input type="text" id="airtableBase" value="appVkAbxdZf4Tp64R" placeholder="appXXX" />
+      <label>GHL API Key</label>
+      <input type="password" id="ghlKey" placeholder="eyJ..." />
+      <label>GHL Location ID</label>
+      <input type="text" id="ghlLocation" placeholder="Location ID" />
+      <button class="save-btn" id="syncBtn" onclick="saveConfig()">Connect &amp; Sync</button>
+      <div id="syncFeedback" style="font-family: var(--font-ui); font-size: 11px; margin-top: 8px; text-align: center;"></div>
+    </div>
+  </aside>
+
+  <!-- ═══ MAIN ═══ -->
+  <div class="main">
+    <div class="header">
+      <div class="header-left">
+        <h1>Content Engine</h1>
+        <div class="subtitle" id="dateDisplay"></div>
+      </div>
+      <div class="header-actions">
+        <button class="btn btn-ghost btn-sm" onclick="refreshAll()">↻ Refresh</button>
+        <button class="btn btn-primary" onclick="showTab('compose')">+ New Post</button>
+      </div>
+    </div>
+
+    <!-- ═══ TAB: OVERVIEW ═══ -->
+    <div class="tab-panel active" id="tab-overview">
+      <!-- KPIs -->
+      <div class="kpi-row">
+        <div class="kpi">
+          <div class="kpi-label">Posts This Week</div>
+          <div class="kpi-value" id="kpi-posts">—</div>
+          <div class="kpi-source">Airtable</div>
+        </div>
+        <div class="kpi">
+          <div class="kpi-label">Email Subs (7d)</div>
+          <div class="kpi-value" id="kpi-subs">—</div>
+          <div class="kpi-delta up" id="kpi-subs-delta"></div>
+          <div class="kpi-source">GoHighLevel</div>
+        </div>
+        <div class="kpi">
+          <div class="kpi-label">LinkedIn Impressions</div>
+          <div class="kpi-value" id="kpi-li-impressions">—</div>
+          <div class="kpi-source">LinkedIn</div>
+        </div>
+        <div class="kpi">
+          <div class="kpi-label">LI Profile Views</div>
+          <div class="kpi-value" id="kpi-li-views">—</div>
+          <div class="kpi-source">LinkedIn</div>
+        </div>
+        <div class="kpi">
+          <div class="kpi-label">Landing Page Visits</div>
+          <div class="kpi-value" id="kpi-lp-visits">—</div>
+          <div class="kpi-source">Forecaster</div>
+        </div>
+        <div class="kpi">
+          <div class="kpi-label">Scheduled Calls</div>
+          <div class="kpi-value" id="kpi-calls">—</div>
+          <div class="kpi-source">GoHighLevel</div>
+        </div>
+      </div>
+
+      <!-- Charts -->
+      <div class="chart-row">
+        <div class="card">
+          <div class="card-header">
+            <div class="card-title">Content Output (Last 8 Weeks)</div>
+          </div>
+          <div class="chart-container"><canvas id="chartContentOutput"></canvas></div>
+        </div>
+        <div class="card">
+          <div class="card-header">
+            <div class="card-title">Funnel Conversion</div>
+          </div>
+          <div class="chart-container"><canvas id="chartFunnel"></canvas></div>
+        </div>
+      </div>
+
+      <!-- Today's Queue -->
+      <div class="card">
+        <div class="card-header">
+          <div class="card-title">Today's Content Queue</div>
+          <span class="card-badge" id="todayCount">0 posts</span>
+        </div>
+        <div id="todayQueue">
+          <div class="loading"><div class="spinner"></div> Connect Airtable to load pipeline...</div>
+        </div>
+      </div>
+
+      <!-- Best Performing -->
+      <div class="card">
+        <div class="card-header">
+          <div class="card-title">Top Performing Posts</div>
+          <span class="card-badge">By Engagement</span>
+        </div>
+        <div id="bestPosts">
+          <div class="loading"><div class="spinner"></div> Connect Airtable to load posts...</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ═══ TAB: PIPELINE ═══ -->
+    <div class="tab-panel" id="tab-pipeline">
+      <div class="card">
+        <div class="card-header">
+          <div class="card-title">Content Pipeline</div>
+          <div style="display:flex; gap:6px; align-items:center; flex-wrap:wrap;">
+            <select id="pipelineFilter" onchange="refreshPipeline()" style="font-family: var(--font-ui); font-size: 12px; padding: 6px 10px; border: 1px solid var(--border); border-radius: 6px;">
+              <option value="all">All Copy Status</option>
+              <option value="Review">Review</option>
+              <option value="Done">Done</option>
+              <option value="Edit">Edit</option>
+            </select>
+            <select id="pipelineProdFilter" onchange="refreshPipeline()" style="font-family: var(--font-ui); font-size: 12px; padding: 6px 10px; border: 1px solid var(--border); border-radius: 6px;">
+              <option value="all">All Production</option>
+              <option value="Script">Script</option>
+              <option value="Record">Record</option>
+              <option value="Done">Done</option>
+            </select>
+            <select id="pipelineType" onchange="refreshPipeline()" style="font-family: var(--font-ui); font-size: 12px; padding: 6px 10px; border: 1px solid var(--border); border-radius: 6px;">
+              <option value="all">All Types</option>
+              <option value="LinkedIn Post">LinkedIn Post</option>
+              <option value="Youtube Podcast">Youtube Podcast</option>
+              <option value="Youtube Video">Youtube Video</option>
+              <option value="Email Newsletter">Email Newsletter</option>
+            </select>
+          </div>
+        </div>
+        <div class="pipeline-table-wrap" id="pipelineTable">
+          <div class="loading"><div class="spinner"></div> Connect Airtable to load pipeline...</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ═══ TAB: COMPOSE ═══ -->
+    <div class="tab-panel" id="tab-compose">
+
+      <!-- ── TOP HITS ROW ── -->
+      <div class="card" style="margin-bottom: 20px;">
+        <div class="card-header">
+          <div class="card-title">Your Top Hits</div>
+          <button class="btn btn-ghost btn-sm" onclick="openTopHitsModal()">View All Top Posts &rarr;</button>
+        </div>
+        <p style="font-family: var(--font-body); font-size: 13px; color: var(--text-dim); margin-bottom: 12px;">
+          Click a top-performing post to use as inspiration for your next piece.
+        </p>
+        <div class="top-hits-row" id="topHitsRow">
+          <div style="padding:20px; text-align:center; color: var(--text-dim); font-family: var(--font-ui); font-size: 12px; width:100%;">
+            Connect Airtable to load your top-performing posts.
+          </div>
+        </div>
+      </div>
+
+      <!-- ── BUILD YOUR POST ── -->
+      <div class="compose-panel">
+        <div class="compose-editor">
+          <div class="card-header" style="margin-bottom:16px;">
+            <div class="card-title">Build Your Post</div>
+            <div style="display:flex; gap:8px;">
+              <select id="composeType" style="font-family: var(--font-ui); font-size: 12px; padding: 6px 10px; border: 1px solid var(--border); border-radius: 6px;">
+                <option>LinkedIn Post</option>
+                <option>Youtube Podcast</option>
+                <option>Youtube Video</option>
+                <option>Email Newsletter</option>
+              </select>
+              <button class="btn btn-primary btn-sm" onclick="generatePost()">Generate Post</button>
+              <button class="btn btn-ghost btn-sm" onclick="savePost()">Save to Airtable</button>
+            </div>
+          </div>
+
+          <!-- Step indicators -->
+          <div style="display:flex; gap: 14px; margin-bottom: 20px; font-family: var(--font-ui); font-size: 12px; flex-wrap:wrap;">
+            <div style="display:flex; align-items:center; gap:6px;">
+              <span style="width:22px; height:22px; border-radius:50%; background: var(--green-primary); color:white; display:flex; align-items:center; justify-content:center; font-size:11px; font-weight:800;">1</span>
+              <span style="font-weight:600;">Transcript</span>
+            </div>
+            <div style="display:flex; align-items:center; gap:6px;">
+              <span style="width:22px; height:22px; border-radius:50%; background: var(--orange); color:white; display:flex; align-items:center; justify-content:center; font-size:11px; font-weight:800;">2</span>
+              <span style="font-weight:600;">Template</span>
+            </div>
+            <div style="display:flex; align-items:center; gap:6px;">
+              <span style="width:22px; height:22px; border-radius:50%; background: var(--purple); color:white; display:flex; align-items:center; justify-content:center; font-size:11px; font-weight:800;">3</span>
+              <span style="font-weight:600;">Hook</span>
+            </div>
+          </div>
+
+          <!-- Selections summary -->
+          <div id="selectionsSummary" style="display:flex; gap:8px; flex-wrap:wrap; margin-bottom:12px; min-height: 28px;">
+            <span style="font-family: var(--font-ui); font-size: 11px; color: var(--text-dim);">Select ingredients from the right panel, then click "Generate Post"</span>
+          </div>
+
+          <!-- Guidelines Panel (collapsed by default) -->
+          <div id="guidelinesPanel" style="display:none; margin-bottom:12px; background:var(--off-white); border:1px solid var(--border); border-radius:var(--radius-sm); padding:16px; font-family:var(--font-ui); font-size:12px;">
+            <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:12px;">
+              <span style="font-weight:700; font-size:13px;">Post Guidelines</span>
+              <button class="btn btn-ghost btn-sm" style="font-size:10px; padding:2px 8px;" onclick="toggleGuidelinesPanel()">Close</button>
+            </div>
+            <div style="display:flex; flex-direction:column; gap:8px;">
+              <label style="display:flex; align-items:flex-start; gap:8px; cursor:pointer;">
+                <input type="checkbox" id="rule-oneIdea" checked style="margin-top:2px;"> <span><strong>One idea, one direction.</strong> Each post centers on ONE concept. No mashups.</span>
+              </label>
+              <label style="display:flex; align-items:flex-start; gap:8px; cursor:pointer;">
+                <input type="checkbox" id="rule-plainLang" checked style="margin-top:2px;"> <span><strong>Plain English.</strong> Short sentences. Concrete examples. If someone has to reread, rewrite.</span>
+              </label>
+              <label style="display:flex; align-items:flex-start; gap:8px; cursor:pointer;">
+                <input type="checkbox" id="rule-reframe" checked style="margin-top:2px;"> <span><strong>Shift in perspective.</strong> Include at least one clear reframe.</span>
+              </label>
+              <label style="display:flex; align-items:flex-start; gap:8px; cursor:pointer;">
+                <input type="checkbox" id="rule-shareable" checked style="margin-top:2px;"> <span><strong>Built-in shareability.</strong> 1-2 lines people want to share to express identity.</span>
+              </label>
+              <label style="display:flex; align-items:flex-start; gap:8px; cursor:pointer;">
+                <input type="checkbox" id="rule-formatting" checked style="margin-top:2px;"> <span><strong>Tight formatting.</strong> 1-3 line paragraphs. Lots of white space. Bullets only where they help.</span>
+              </label>
+              <label style="display:flex; align-items:flex-start; gap:8px; cursor:pointer;">
+                <input type="checkbox" id="rule-strongEnd" checked style="margin-top:2px;"> <span><strong>No weak ending.</strong> Sharp takeaway, punchy line, or real question. No limp "thoughts?"</span>
+              </label>
+              <label style="display:flex; align-items:flex-start; gap:8px; cursor:pointer;">
+                <input type="checkbox" id="rule-noCTA" style="margin-top:2px;"> <span><strong>Skip hard CTA.</strong> End with question or takeaway only — no pitch this post.</span>
+              </label>
+              <label style="display:flex; align-items:flex-start; gap:8px; cursor:pointer;">
+                <input type="checkbox" id="rule-conviction" checked style="margin-top:2px;"> <span><strong>Write with conviction.</strong> Confident, direct, no over-hedging. You've wired $50K-$250K checks.</span>
+              </label>
+              <label style="display:flex; align-items:flex-start; gap:8px; cursor:pointer;">
+                <input type="checkbox" id="rule-noForcedNeg" checked style="margin-top:2px;"> <span><strong>No forced negatives.</strong> Don't say "It's not X, it's Y." Just make the point.</span>
+              </label>
+            </div>
+          </div>
+
+          <div style="margin-bottom: 4px; font-family: var(--font-ui); font-size: 11px; font-weight: 700; text-transform: uppercase; letter-spacing: 1px; color: var(--text-dim);">Post Name</div>
+          <input type="text" id="composeTitle" placeholder="Give this post a working title..." style="width:100%; padding: 12px; border: 1px solid var(--border); border-radius: 8px; font-family: var(--font-ui); font-size: 14px; font-weight: 700; margin-bottom: 16px; outline:none;" />
+          <div style="margin-bottom: 4px; font-family: var(--font-ui); font-size: 11px; font-weight: 700; text-transform: uppercase; letter-spacing: 1px; color: var(--text-dim);">Angle / Point</div>
+          <input type="text" id="composeAngle" placeholder="What's the one takeaway? e.g. 'Most LPs look at the wrong deals first'" style="width:100%; padding: 10px 12px; border: 1px solid var(--border); border-radius: 8px; font-family: var(--font-ui); font-size: 13px; margin-bottom: 16px; outline:none; color: var(--text); font-style: italic;" />
+          <div style="margin-bottom: 4px; font-family: var(--font-ui); font-size: 11px; font-weight: 700; text-transform: uppercase; letter-spacing: 1px; color: var(--text-dim);">Content</div>
+          <textarea id="composeBody" placeholder="Click 'Generate Post' after selecting a transcript, hook pattern, and template — or write freeform here."></textarea>
+          <div style="margin-top: 12px; display: flex; gap: 8px; flex-wrap: wrap;">
+            <button class="btn btn-ghost btn-sm" onclick="insertBrandVoice()">Brand Voice Check</button>
+            <button class="btn btn-ghost btn-sm" onclick="insertCTA()">Insert CTA</button>
+            <button class="btn btn-ghost btn-sm" onclick="insertDisclaimer()">Disclaimer</button>
+          </div>
+
+          <!-- Generated output highlights -->
+          <div class="generated-output" id="generatedOutput">
+            <div style="display:grid; grid-template-columns:1fr 1fr 1fr; gap:12px;">
+              <div class="go-section">
+                <div class="go-label">Call to Action</div>
+                <div class="go-highlight cta" id="goCTA">—</div>
+              </div>
+              <div class="go-section">
+                <div class="go-label">What the reader gets</div>
+                <div class="go-highlight value" id="goValue">—</div>
+              </div>
+              <div class="go-section">
+                <div class="go-label">Suggested Image</div>
+                <div class="go-highlight image" id="goImage">—</div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Writing Style Reference -->
+          <div style="margin-top:16px;">
+            <div style="display:flex; align-items:center; justify-content:space-between; margin-bottom:8px;">
+              <div style="font-family: var(--font-ui); font-size: 11px; font-weight: 700; text-transform: uppercase; letter-spacing: 1px; color: var(--text-dim);">Writing Style Reference</div>
+              <button class="btn btn-ghost btn-sm" onclick="showTab('swipe')" style="font-size:10px; padding:2px 8px;">Browse All &rarr;</button>
+            </div>
+            <div class="style-picker-grid" id="stylePickerGrid">
+              <!-- Filled by JS from swipe file -->
+            </div>
+          </div>
+        </div>
+
+        <!-- ── RIGHT SIDEBAR: INGREDIENTS ── -->
+        <div class="compose-sidebar">
+
+          <!-- 1: Transcripts -->
+          <div class="card" style="margin-bottom:0;">
+            <div class="card-header">
+              <div class="card-title">1. Call Transcripts</div>
+            </div>
+            <div class="transcript-list" id="transcriptList">
+              <div style="padding:20px; text-align:center; color: var(--text-dim); font-family: var(--font-ui); font-size: 12px;">
+                Loading transcripts from Google Drive...
+              </div>
+            </div>
+          </div>
+
+          <!-- 2: Template / Format -->
+          <div class="card" style="margin-bottom:0;">
+            <div class="card-header">
+              <div class="card-title">2. Post Template</div>
+            </div>
+            <div class="template-chips" id="templateChips">
+              <div class="template-chip" onclick="selectTemplate(this, 'story')">Story Arc</div>
+              <div class="template-chip" onclick="selectTemplate(this, 'listicle')">Listicle</div>
+              <div class="template-chip" onclick="selectTemplate(this, 'hot-take')">Hot Take</div>
+              <div class="template-chip" onclick="selectTemplate(this, 'case-study')">Case Study</div>
+              <div class="template-chip" onclick="selectTemplate(this, 'framework')">Framework</div>
+              <div class="template-chip" onclick="selectTemplate(this, 'myth-bust')">Myth Buster</div>
+              <div class="template-chip" onclick="selectTemplate(this, 'before-after')">Before/After</div>
+              <div class="template-chip" onclick="selectTemplate(this, 'lesson')">Lesson Learned</div>
+            </div>
+          </div>
+
+          <!-- 3: Hook Pattern -->
+          <div class="card" style="margin-bottom:0;">
+            <div class="card-header">
+              <div class="card-title">3. Hook Pattern</div>
+              <button class="btn btn-ghost btn-sm" style="font-size:10px; padding:2px 8px;" onclick="toggleGuidelinesPanel()">Guidelines</button>
+            </div>
+            <div style="display:flex; flex-wrap:wrap; gap:6px;" id="hookPatternChips">
+              <div class="template-chip" onclick="selectHookPattern(this, 'dream-math')">Dream Outcome Math</div>
+              <div class="template-chip" onclick="selectHookPattern(this, 'pain-gap')">Pain + Gap</div>
+              <div class="template-chip" onclick="selectHookPattern(this, 'specific-person')">Specific Person Story</div>
+              <div class="template-chip" onclick="selectHookPattern(this, 'confession')">Confession / Origin</div>
+              <div class="template-chip" onclick="selectHookPattern(this, 'big-scary')">Big Scary Statement</div>
+              <div class="template-chip" onclick="selectHookPattern(this, 'comparison')">Comparison</div>
+              <div class="template-chip" onclick="selectHookPattern(this, 'most-vs-best')">Most vs Best</div>
+              <div class="template-chip" onclick="selectHookPattern(this, 'lie-reframe')">Lie / Reframe</div>
+              <div class="template-chip" onclick="selectHookPattern(this, 'scene-feeling')">Scene + Feeling</div>
+              <div class="template-chip" onclick="selectHookPattern(this, 'list-secrets')">List / Secrets</div>
+              <div class="template-chip" onclick="selectHookPattern(this, 'student-question')">Student Question</div>
+            </div>
+          </div>
+
+          <!-- Transcript Preview (after all selections) -->
+          <div class="card" style="margin-bottom:0;">
+            <div class="card-header">
+              <div class="card-title">Transcript Preview</div>
+            </div>
+            <div class="transcript-snippet" id="transcriptSnippet">
+              Click a transcript above to preview content.
+            </div>
+          </div>
+
+        </div>
+      </div>
+    </div>
+
+    <!-- ═══ TOP HITS MODAL ═══ -->
+    <div class="top-hits-modal" id="topHitsModal">
+      <div class="top-hits-modal-content">
+        <button class="close-btn" onclick="closeTopHitsModal()">&times;</button>
+        <h2 style="font-family: var(--font-headline); font-size: 22px; margin-bottom: 4px;">All Top-Performing Posts</h2>
+        <p style="font-family: var(--font-body); font-size: 14px; color: var(--text-dim); margin-bottom: 16px;">Ranked by engagement. Click any post to use it as inspiration.</p>
+        <div class="top-hits-grid" id="topHitsGrid">
+          <!-- Filled by JS -->
+        </div>
+      </div>
+    </div>
+
+    <!-- ═══ TAB: SWIPE FILE ═══ -->
+    <div class="tab-panel" id="tab-swipe">
+      <div class="card" style="margin-bottom:20px;">
+        <div class="card-header">
+          <div class="card-title">Content Swipe File</div>
+          <button class="btn btn-primary btn-sm" onclick="showAddSwipe()">+ Add Post</button>
+        </div>
+        <p style="font-family: var(--font-body); font-size: 14px; color: var(--text-dim); margin-bottom: 4px;">
+          Pin LinkedIn posts and writing styles you want your content engine to reference.
+        </p>
+      </div>
+      <div class="swipe-grid" id="swipeGrid">
+        <!-- Pre-loaded examples -->
+      </div>
+    </div>
+
+    <!-- ═══ TAB: FUNNEL ═══ -->
+    <div class="tab-panel" id="tab-funnel">
+      <div class="card">
+        <div class="card-header">
+          <div class="card-title">Full-Funnel Metrics</div>
+          <span class="card-badge">Last 30 Days</span>
+        </div>
+        <div class="funnel-flow" id="funnelFlow">
+          <div class="funnel-stage">
+            <div class="fs-label">Impressions</div>
+            <div class="fs-value" id="f-impressions">—</div>
+          </div>
+          <div class="funnel-arrow">→</div>
+          <div class="funnel-stage">
+            <div class="fs-label">Profile Views</div>
+            <div class="fs-value" id="f-profile">—</div>
+            <div class="fs-rate" id="f-profile-rate"></div>
+          </div>
+          <div class="funnel-arrow">→</div>
+          <div class="funnel-stage">
+            <div class="fs-label">LP Visits</div>
+            <div class="fs-value" id="f-lp">—</div>
+            <div class="fs-rate" id="f-lp-rate"></div>
+          </div>
+          <div class="funnel-arrow">→</div>
+          <div class="funnel-stage">
+            <div class="fs-label">Opt-Ins</div>
+            <div class="fs-value" id="f-optins">—</div>
+            <div class="fs-rate" id="f-optins-rate"></div>
+          </div>
+          <div class="funnel-arrow">→</div>
+          <div class="funnel-stage">
+            <div class="fs-label">Calls Booked</div>
+            <div class="fs-value" id="f-calls">—</div>
+            <div class="fs-rate" id="f-calls-rate"></div>
+          </div>
+          <div class="funnel-arrow">→</div>
+          <div class="funnel-stage">
+            <div class="fs-label">Sales</div>
+            <div class="fs-value" id="f-sales">—</div>
+            <div class="fs-rate" id="f-sales-rate"></div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Forecaster Data -->
+      <div class="chart-row" style="margin-top: 20px;">
+        <div class="card">
+          <div class="card-header">
+            <div class="card-title">Subscribers Over Time</div>
+            <span class="card-badge">Forecaster</span>
+          </div>
+          <div class="chart-container"><canvas id="chartSubs"></canvas></div>
+        </div>
+        <div class="card">
+          <div class="card-header">
+            <div class="card-title">Revenue Streams</div>
+            <span class="card-badge">Forecaster</span>
+          </div>
+          <div class="chart-container"><canvas id="chartRevenue"></canvas></div>
+        </div>
+      </div>
+
+      <!-- Forecaster monthly table -->
+      <div class="card">
+        <div class="card-header">
+          <div class="card-title">Monthly Forecaster Snapshot</div>
+        </div>
+        <div style="overflow-x:auto;">
+          <table class="pipeline-table" id="forecasterTable">
+            <thead>
+              <tr>
+                <th>Metric</th>
+                <th>Oct '24</th>
+                <th>Nov '24</th>
+                <th>Dec '24</th>
+                <th>Jan '25</th>
+                <th>Feb '25</th>
+                <th>Mar '25</th>
+              </tr>
+            </thead>
+            <tbody id="forecasterBody">
+              <tr><td colspan="7" style="text-align:center;color:var(--text-dim);">Forecaster data from your spreadsheet</td></tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+
+    <!-- ═══ TAB: ANALYTICS ═══ -->
+    <div class="tab-panel" id="tab-analytics">
+      <div class="chart-row">
+        <div class="card">
+          <div class="card-header">
+            <div class="card-title">LinkedIn Impressions (Weekly)</div>
+          </div>
+          <div class="chart-container"><canvas id="chartLI"></canvas></div>
+        </div>
+        <div class="card">
+          <div class="card-header">
+            <div class="card-title">Facebook Reach (Weekly)</div>
+          </div>
+          <div class="chart-container"><canvas id="chartFB"></canvas></div>
+        </div>
+      </div>
+      <div class="card">
+        <div class="card-header">
+          <div class="card-title">Post Performance Breakdown</div>
+        </div>
+        <div id="analyticsTable">
+          <div class="loading"><div class="spinner"></div> Connect to load analytics...</div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ═══ ADD SWIPE MODAL ═══ -->
+<div class="modal-overlay" id="swipeModal">
+  <div class="modal">
+    <h2>Add to Swipe File</h2>
+    <div class="form-group">
+      <label>Author Name</label>
+      <input type="text" id="swipeAuthor" placeholder="e.g., Chris Walker" />
+    </div>
+    <div class="form-group">
+      <label>LinkedIn Handle</label>
+      <input type="text" id="swipeHandle" placeholder="e.g., @chriswalker" />
+    </div>
+    <div class="form-group">
+      <label>Post Text / Hook</label>
+      <textarea id="swipeText" rows="5" placeholder="Paste the post or key hook here..."></textarea>
+    </div>
+    <div class="form-group">
+      <label>Tags (comma-separated)</label>
+      <input type="text" id="swipeTags" placeholder="e.g., storytelling, hook, CTA" />
+    </div>
+    <div class="form-group">
+      <label>Post URL (optional)</label>
+      <input type="text" id="swipeUrl" placeholder="https://linkedin.com/..." />
+    </div>
+    <div class="modal-actions">
+      <button class="btn btn-ghost btn-sm" onclick="hideModal('swipeModal')">Cancel</button>
+      <button class="btn btn-primary btn-sm" onclick="addSwipePost()">Save Post</button>
+    </div>
+  </div>
+</div>
+
+<script>
+// ═══════════════════════════════════════
+// STATE
+// ═══════════════════════════════════════
+const STATE = {
+  config: loadConfig(),
+  airtableRecords: [],
+  ghlContacts: [],
+  swipeFile: loadSwipeFile(),
+  transcripts: [],
+  selectedTranscript: null,
+  selectedTranscriptIdx: null,
+  selectedStyle: null,
+  selectedTemplate: null,
+  selectedTopHit: null,
+  topHits: [],
+};
+
+// ═══════════════════════════════════════
+// CONFIG / PERSISTENCE
+// ═══════════════════════════════════════
+function loadConfig() {
+  try { return JSON.parse(localStorage.getItem('gyc_config')) || {}; } catch { return {}; }
+}
+function loadSwipeFile() {
+  try { return JSON.parse(localStorage.getItem('gyc_swipe')) || getDefaultSwipe(); } catch { return getDefaultSwipe(); }
+}
+async function saveConfig() {
+  const btn = document.getElementById('syncBtn');
+  const fb = document.getElementById('syncFeedback');
+  btn.textContent = 'Connecting...';
+  btn.disabled = true;
+  fb.style.color = 'rgba(255,255,255,0.5)';
+  fb.textContent = 'Saving config...';
+
+  const config = {
+    airtableKey: document.getElementById('airtableKey').value.trim(),
+    airtableBase: document.getElementById('airtableBase').value.trim(),
+    ghlKey: document.getElementById('ghlKey').value.trim(),
+    ghlLocation: document.getElementById('ghlLocation').value.trim(),
+  };
+  localStorage.setItem('gyc_config', JSON.stringify(config));
+  STATE.config = config;
+  updateConnectionStatus();
+
+  try {
+    fb.textContent = 'Finding content table...';
+    // Try to detect the right table name
+    if (config.airtableKey && config.airtableBase) {
+      const tableName = await detectTableName();
+      if (tableName) {
+        STATE.tableName = tableName;
+        localStorage.setItem('gyc_tableName', tableName);
+        fb.style.color = 'var(--green-accent)';
+        fb.textContent = `✓ Found table: "${tableName}"`;
+      }
+    }
+    await refreshAll();
+    btn.textContent = 'Connected ✓';
+    btn.style.background = 'var(--green-hover)';
+    setTimeout(() => {
+      btn.textContent = 'Connect & Sync';
+      btn.style.background = '';
+      btn.disabled = false;
+    }, 3000);
+  } catch(e) {
+    fb.style.color = '#ff6b6b';
+    fb.textContent = '✗ ' + e.message;
+    btn.textContent = 'Retry';
+    btn.disabled = false;
+  }
+}
+
+async function detectTableName() {
+  // Try common table names to find the content table
+  const candidates = [
+    'Content',
+    'Content DB',
+    'LinkedIn Posts',
+    'All Content',
+    'Posts',
+  ];
+  for (const name of candidates) {
+    try {
+      const url = `https://api.airtable.com/v0/${STATE.config.airtableBase}/${encodeURIComponent(name)}?maxRecords=1`;
+      const resp = await fetch(url, {
+        headers: { 'Authorization': `Bearer ${STATE.config.airtableKey}` }
+      });
+      if (resp.ok) {
+        console.log(`Found table: ${name}`);
+        return name;
+      }
+      const err = await resp.json();
+      console.log(`Table "${name}": ${resp.status}`, err);
+    } catch(e) {
+      console.log(`Table "${name}" error:`, e);
+    }
+  }
+  // If none found, try listing all tables via meta API
+  try {
+    const resp = await fetch(`https://api.airtable.com/v0/meta/bases/${STATE.config.airtableBase}/tables`, {
+      headers: { 'Authorization': `Bearer ${STATE.config.airtableKey}` }
+    });
+    if (resp.ok) {
+      const data = await resp.json();
+      const tables = (data.tables || []).map(t => t.name);
+      console.log('Available tables:', tables);
+      // Pick the first table that looks like content
+      const match = tables.find(t => /content|post|linkedin/i.test(t));
+      if (match) return match;
+      if (tables.length > 0) return tables[0];
+    }
+  } catch(e) {
+    console.log('Meta API failed (may need schema scope):', e);
+  }
+  throw new Error('Could not find content table. Check API key & base ID.');
+}
+function updateConnectionStatus() {
+  const el = document.getElementById('connectionStatus');
+  const hasAT = !!STATE.config.airtableKey;
+  const hasGHL = !!STATE.config.ghlKey;
+  if (hasAT && hasGHL) {
+    el.innerHTML = '<span class="dot dot-ok"></span> All connected';
+  } else if (hasAT || hasGHL) {
+    el.innerHTML = '<span class="dot dot-ok"></span> Partially connected';
+  } else {
+    el.innerHTML = '<span class="dot dot-off"></span> Not connected';
+  }
+}
+
+// ═══════════════════════════════════════
+// TABS
+// ═══════════════════════════════════════
+function showTab(tabId) {
+  document.querySelectorAll('.tab-panel').forEach(p => p.classList.remove('active'));
+  document.querySelectorAll('.sidebar-link').forEach(l => l.classList.remove('active'));
+  document.getElementById('tab-' + tabId)?.classList.add('active');
+  document.querySelector(`[data-tab="${tabId}"]`)?.classList.add('active');
+}
+document.querySelectorAll('.sidebar-link[data-tab]').forEach(link => {
+  link.addEventListener('click', () => showTab(link.dataset.tab));
+});
+
+// ═══════════════════════════════════════
+// AIRTABLE API
+// ═══════════════════════════════════════
+async function fetchAirtable(table, params = {}) {
+  if (!STATE.config.airtableKey || !STATE.config.airtableBase) return [];
+  const url = new URL(`https://api.airtable.com/v0/${STATE.config.airtableBase}/${encodeURIComponent(table)}`);
+  Object.entries(params).forEach(([k, v]) => url.searchParams.set(k, v));
+
+  let allRecords = [];
+  let offset = null;
+  do {
+    if (offset) url.searchParams.set('offset', offset);
+    const resp = await fetch(url, {
+      headers: { 'Authorization': `Bearer ${STATE.config.airtableKey}` }
+    });
+    if (!resp.ok) {
+      const errData = await resp.json().catch(() => ({}));
+      console.error('Airtable error:', resp.status, errData);
+      throw new Error(`Airtable ${resp.status}: ${errData.error?.message || 'Unknown error'}`);
+    }
+    const data = await resp.json();
+    allRecords = allRecords.concat(data.records || []);
+    offset = data.offset;
+  } while (offset);
+  return allRecords;
+}
+
+async function loadContent() {
+  try {
+    const tableName = STATE.tableName || localStorage.getItem('gyc_tableName') || 'Content';
+    const records = await fetchAirtable(tableName, {});
+    STATE.airtableRecords = records;
+    renderPipeline(records);
+    renderTodayQueue(records);
+    renderBestPosts(records);
+    renderTranscripts();
+    renderTopHits(records);
+    updateKPIs(records);
+  } catch (e) {
+    console.error('Airtable load failed:', e);
+  }
+}
+
+// ═══════════════════════════════════════
+// GHL API
+// ═══════════════════════════════════════
+async function fetchGHLContacts() {
+  if (!STATE.config.ghlKey || !STATE.config.ghlLocation) return;
+  try {
+    // Get contacts from last 7 days
+    const sevenDaysAgo = new Date(Date.now() - 7 * 86400000).toISOString();
+    const url = `https://services.leadconnectorhq.com/contacts/?locationId=${STATE.config.ghlLocation}&startAfter=0&limit=100&query=&startAfterId=`;
+
+    const resp = await fetch(url, {
+      headers: {
+        'Authorization': `Bearer ${STATE.config.ghlKey}`,
+        'Version': '2021-07-28',
+      }
+    });
+    if (!resp.ok) throw new Error(`GHL ${resp.status}`);
+    const data = await resp.json();
+    STATE.ghlContacts = data.contacts || [];
+    // Count recent subscribers
+    const recent = STATE.ghlContacts.filter(c => {
+      const created = new Date(c.dateAdded);
+      return created >= new Date(Date.now() - 7 * 86400000);
+    });
+    document.getElementById('kpi-subs').textContent = recent.length;
+    document.getElementById('kpi-subs-delta').textContent = `+${recent.length} this week`;
+  } catch (e) {
+    console.error('GHL load failed:', e);
+  }
+}
+
+// ═══════════════════════════════════════
+// FIELD HELPERS (Airtable fields can be strings, arrays, or missing)
+// ═══════════════════════════════════════
+function fieldStr(fields, name) {
+  const v = fields[name];
+  if (v == null) return '';
+  if (Array.isArray(v)) return v.filter(x => typeof x === 'string').join(', ');
+  if (typeof v === 'object') return '';
+  return String(v);
+}
+function fieldArr(fields, name) {
+  const v = fields[name];
+  if (v == null) return [];
+  if (Array.isArray(v)) return v;
+  return [String(v)];
+}
+function safeText(fields, name) {
+  const v = fields[name];
+  if (v == null) return '';
+  if (typeof v === 'string') return v;
+  if (Array.isArray(v)) return v.filter(x => typeof x === 'string').join(', ');
+  return '';
+}
+
+// ═══════════════════════════════════════
+// RENDER FUNCTIONS
+// ═══════════════════════════════════════
+function getStatusClass(status) {
+  if (!status) return 'status-idea';
+  const s = status.toLowerCase();
+  if (s.includes('done')) return 'status-done';
+  if (s.includes('review')) return 'status-review';
+  if (s.includes('script')) return 'status-script';
+  if (s.includes('record')) return 'status-record';
+  if (s.includes('scheduled') || s.includes('publish')) return 'status-publish';
+  if (s.includes('edit')) return 'status-edit';
+  return 'status-idea';
+}
+
+function refreshPipeline() {
+  if (STATE.airtableRecords.length) renderPipeline(STATE.airtableRecords);
+}
+
+function copyContentId(id) {
+  navigator.clipboard.writeText(id).then(() => {
+    const btn = event.target;
+    const orig = btn.textContent;
+    btn.textContent = 'Copied!';
+    setTimeout(() => btn.textContent = orig, 1200);
+  });
+}
+
+function renderPipeline(records) {
+  const container = document.getElementById('pipelineTable');
+  if (!records.length) {
+    container.innerHTML = '<div class="empty-state"><div class="icon">📝</div><p>No content records found.</p></div>';
+    return;
+  }
+
+  const filterCopy = document.getElementById('pipelineFilter').value;
+  const filterProd = document.getElementById('pipelineProdFilter').value;
+  const filterType = document.getElementById('pipelineType').value;
+
+  let filtered = records;
+  if (filterCopy !== 'all') {
+    filtered = filtered.filter(r => {
+      const status = fieldStr(r.fields, 'Copy Status');
+      return status.toLowerCase().includes(filterCopy.toLowerCase());
+    });
+  }
+  if (filterProd !== 'all') {
+    filtered = filtered.filter(r => {
+      const status = fieldStr(r.fields, 'Production Status');
+      return status.toLowerCase().includes(filterProd.toLowerCase());
+    });
+  }
+  if (filterType !== 'all') {
+    filtered = filtered.filter(r => fieldStr(r.fields, 'Content Type').includes(filterType));
+  }
+
+  let html = `<table class="pipeline-table">
+    <thead><tr>
+      <th>ID</th>
+      <th>Description</th>
+      <th>Image</th>
+      <th>Ready</th>
+      <th>Type</th>
+      <th>Production</th>
+      <th>Copy Editor</th>
+      <th>Copy Status</th>
+      <th>Image Status</th>
+      <th>Tags</th>
+      <th>Published</th>
+      <th>Actions</th>
+    </tr></thead><tbody>`;
+
+  filtered.slice(0, 60).forEach(r => {
+    const f = r.fields;
+    const id = fieldStr(f, 'Content ID');
+    const desc = (fieldStr(f, 'Description') || fieldStr(f, 'Title / Hook')).substring(0, 60);
+    const thumbUrl = getThumbUrl(f);
+    const ready = f['Ready'];
+    const isReady = ready === true || String(ready).toLowerCase() === 'true';
+    const type = fieldStr(f, 'Content Type');
+    const prodStatus = fieldStr(f, 'Production Status');
+    const copyEditor = fieldStr(f, 'Copy Editor');
+    const copyStatus = fieldStr(f, 'Copy Status');
+    const imageStatus = fieldStr(f, 'Image Status');
+    const tags = fieldStr(f, 'Tags');
+    const published = fieldStr(f, 'Published');
+    const postUrl = getPostUrl(f);
+    const frameUrl = fieldStr(f, 'Frame.io Folder');
+
+    const prodClass = getStatusClass(prodStatus);
+    const copyClass = getStatusClass(copyStatus);
+    const imgClass = getStatusClass(imageStatus);
+
+    const thumbHtml = thumbUrl
+      ? `<img class="pipeline-thumb" src="${thumbUrl}" alt="" loading="lazy">`
+      : `<div class="pipeline-thumb-placeholder">🖼</div>`;
+
+    const readyHtml = isReady
+      ? `<span class="pipeline-ready-icon pipeline-ready-yes">✓</span>`
+      : `<span class="pipeline-ready-icon pipeline-ready-no">—</span>`;
+
+    html += `<tr>
+      <td style="font-weight:700; color: var(--accent); white-space:nowrap;">${escapeHtml(id)}</td>
+      <td style="max-width:180px; overflow:hidden; text-overflow:ellipsis; white-space:nowrap;">${desc ? escapeHtml(desc) : '<em style="color:var(--text-dim)">—</em>'}</td>
+      <td>${thumbHtml}</td>
+      <td style="text-align:center;">${readyHtml}</td>
+      <td style="font-size:11px; white-space:nowrap;">${escapeHtml(type)}</td>
+      <td>${prodStatus ? `<span class="status-badge ${prodClass}">${escapeHtml(prodStatus)}</span>` : '—'}</td>
+      <td style="font-size:12px; white-space:nowrap;">${escapeHtml(copyEditor) || '—'}</td>
+      <td>${copyStatus ? `<span class="status-badge ${copyClass}">${escapeHtml(copyStatus)}</span>` : '—'}</td>
+      <td>${imageStatus ? `<span class="status-badge ${imgClass}">${escapeHtml(imageStatus)}</span>` : '—'}</td>
+      <td style="font-size:11px; color: var(--text-dim); max-width:120px; overflow:hidden; text-overflow:ellipsis; white-space:nowrap;">${escapeHtml(tags)}</td>
+      <td style="font-size:11px;">${published ? escapeHtml(published) : '—'}</td>
+      <td>
+        <div class="pipeline-actions">
+          <button class="btn btn-ghost" onclick="copyContentId('${escapeHtml(id)}')" title="Copy ID">Copy</button>
+          ${frameUrl ? `<button class="btn btn-ghost" onclick="window.open('${frameUrl}','_blank')" title="Frame.io Folder">Frame.io</button>` : ''}
+          ${postUrl ? `<button class="btn btn-ghost" onclick="window.open('${postUrl}','_blank')" title="View Post">View</button>` : ''}
+        </div>
+      </td>
+    </tr>`;
+  });
+
+  html += '</tbody></table>';
+  container.innerHTML = html;
+}
+
+function renderTodayQueue(records) {
+  const container = document.getElementById('todayQueue');
+  const queue = records.filter(r => {
+    const status = fieldStr(r.fields, 'Copy Status').toLowerCase();
+    const ready = fieldStr(r.fields, 'Ready').toLowerCase();
+    return status.includes('review') || ready.includes('true') || status.includes('ready') || status.includes('publish');
+  }).slice(0, 10);
+
+  document.getElementById('todayCount').textContent = `${queue.length} posts`;
+
+  if (!queue.length) {
+    container.innerHTML = '<div style="padding:20px; text-align:center; color:var(--text-dim); font-family: var(--font-ui); font-size:13px;">No posts ready for today. Create one!</div>';
+    return;
+  }
+
+  let html = `<table class="pipeline-table"><thead><tr>
+    <th>ID</th><th>Title</th><th>Type</th><th>Status</th><th>Tags</th>
+  </tr></thead><tbody>`;
+
+  queue.forEach(r => {
+    const f = r.fields;
+    const id = fieldStr(f, 'Content ID');
+    const title = (fieldStr(f, 'Title / Hook') || fieldStr(f, 'Description')).substring(0, 60);
+    const type = fieldStr(f, 'Content Type');
+    const status = fieldStr(f, 'Copy Status');
+    const tags = fieldStr(f, 'Tags');
+    html += `<tr>
+      <td style="font-weight:700; color: var(--accent);">${id}</td>
+      <td>${title}</td>
+      <td style="font-size:12px;">${type}</td>
+      <td><span class="status-badge status-review">${status}</span></td>
+      <td style="font-size:12px;">${tags}</td>
+    </tr>`;
+  });
+
+  html += '</tbody></table>';
+  container.innerHTML = html;
+}
+
+function renderBestPosts(records) {
+  const container = document.getElementById('bestPosts');
+  const done = records.filter(r => {
+    const status = fieldStr(r.fields, 'Copy Status').toLowerCase();
+    return status.includes('done');
+  }).slice(0, 6);
+
+  if (!done.length) {
+    container.innerHTML = '<div class="empty-state"><p>No completed posts yet.</p></div>';
+    return;
+  }
+
+  let html = '<div class="content-grid">';
+  done.forEach(r => {
+    const f = r.fields;
+    const title = (fieldStr(f, 'Title / Hook') || fieldStr(f, 'Description') || 'Untitled').substring(0, 80);
+    const type = fieldStr(f, 'Content Type');
+    const editor = fieldStr(f, 'Copy Editor');
+    html += `<div class="content-card">
+      <div class="cc-type">${type}</div>
+      <div class="cc-title">${title}</div>
+      <div class="cc-meta">${editor}</div>
+    </div>`;
+  });
+  html += '</div>';
+  container.innerHTML = html;
+}
+
+// ═══════════════════════════════════════
+// TOP HITS
+// ═══════════════════════════════════════
+function getThumbUrl(fields) {
+  const thumb = fields['Image Thumb'];
+  if (Array.isArray(thumb) && thumb[0]) {
+    const t = thumb[0];
+    return (t.thumbnails && t.thumbnails.large && t.thumbnails.large.url) || t.url || '';
+  }
+  return '';
+}
+function getPostUrl(fields) {
+  const url = fields['Published URL'];
+  if (typeof url === 'string' && url.startsWith('http')) return url;
+  const op = fields['Open Post'];
+  if (op && typeof op === 'object' && op.url) return op.url;
+  return '';
+}
+
+function renderTopHits(records) {
+  const scored = records.map(r => {
+    const f = r.fields;
+    const impressions = parseInt(f['Impressions'] || f['Views'] || 0) || 0;
+    const likes = parseInt(f['Likes'] || f['Reactions'] || 0) || 0;
+    const comments = parseInt(f['Comments'] || 0) || 0;
+    const shares = parseInt(f['Shares'] || f['Reposts'] || 0) || 0;
+    const published = f['Published'] || f['Publish Date'] || '';
+    const title = fieldStr(f, 'Title / Hook') || fieldStr(f, 'Description') || 'Untitled';
+    const body = safeText(f, 'Body') || safeText(f, 'Copy') || safeText(f, 'Post Text') || safeText(f, 'Transcript') || fieldStr(f, 'Description') || '';
+    const type = fieldStr(f, 'Copy Status') || 'Content';
+    const status = fieldStr(f, 'Copy Status').toLowerCase();
+    const isDone = status.includes('done') || status.includes('published') || !!published;
+    const score = impressions + (likes * 10) + (comments * 25) + (shares * 50);
+    const thumbUrl = getThumbUrl(f);
+    const postUrl = getPostUrl(f);
+    return { record: r, title, body, type, impressions, likes, comments, shares, score, published, isDone, thumbUrl, postUrl };
+  }).filter(p => p.isDone || p.score > 0).sort((a, b) => b.score - a.score);
+
+  STATE.topHits = scored;
+
+  const row = document.getElementById('topHitsRow');
+  if (!scored.length) {
+    row.innerHTML = '<div style="padding:20px; text-align:center; color: var(--text-dim); font-family: var(--font-ui); font-size: 12px; width:100%;">No published posts found yet. Posts marked as "Done" with engagement data will appear here.</div>';
+    return;
+  }
+
+  const top3 = scored.slice(0, 3);
+  row.innerHTML = top3.map((p, i) => `
+    <div class="top-hit-card ${STATE.selectedTopHit === i ? 'selected' : ''}" onclick="openTopHit(${i})">
+      <div class="th-rank">#${i + 1}</div>
+      ${p.thumbUrl
+        ? `<div class="th-preview" style="padding:0; overflow:hidden;"><img src="${p.thumbUrl}" style="width:100%; height:100%; object-fit:cover; border-radius:8px; display:block;" onerror="this.parentElement.innerHTML='${escapeHtml(String(p.body || p.title).substring(0, 100))}'"/></div>`
+        : `<div class="th-preview">${escapeHtml(String(p.body || '').substring(0, 140))}${String(p.body || '').length > 140 ? '...' : ''}</div>`
+      }
+      <div class="th-title">${escapeHtml(String(p.title || ''))}</div>
+      <div class="th-stats">
+        ${p.impressions ? `<span><span class="stat-val">${fmtNum(p.impressions)}</span> views</span>` : ''}
+        ${p.likes ? `<span><span class="stat-val">${p.likes}</span> likes</span>` : ''}
+        ${p.comments ? `<span><span class="stat-val">${p.comments}</span> comments</span>` : ''}
+        ${!p.impressions && !p.likes && !p.comments ? `<span>${p.type || 'Published'}</span>` : ''}
+        ${p.postUrl ? `<span style="margin-left:auto;"><a href="${p.postUrl}" target="_blank" rel="noopener" onclick="event.stopPropagation();" style="color:var(--green-primary); text-decoration:none; font-weight:700;">View on LinkedIn ↗</a></span>` : ''}
+      </div>
+    </div>
+  `).join('');
+}
+
+function openTopHit(idx) {
+  const p = STATE.topHits[idx];
+  if (!p) return;
+  if (p.postUrl) {
+    window.open(p.postUrl, '_blank');
+  } else {
+    selectTopHit(idx);
+  }
+}
+
+function fmtNum(n) { return n >= 1000 ? (n / 1000).toFixed(1) + 'K' : String(n); }
+function escapeHtml(s) { const d = document.createElement('div'); d.textContent = s; return d.innerHTML; }
+
+function selectTopHit(idx) {
+  STATE.selectedTopHit = idx;
+  const p = STATE.topHits[idx];
+  if (!p) return;
+  document.getElementById('composeTitle').value = 'Inspired by: ' + p.title;
+  document.getElementById('composeBody').value = p.body;
+  renderTopHits(STATE.airtableRecords); // Re-render to show selected state
+  updateSelectionsSummary();
+}
+
+function openTopHitsModal() {
+  const modal = document.getElementById('topHitsModal');
+  const grid = document.getElementById('topHitsGrid');
+  const hits = STATE.topHits || [];
+  grid.innerHTML = hits.slice(0, 20).map((p, i) => `
+    <div class="top-hit-card" onclick="${p.postUrl ? `window.open('${p.postUrl}', '_blank')` : `selectTopHit(${i}); closeTopHitsModal();`}">
+      <div class="th-rank">#${i + 1}</div>
+      ${p.thumbUrl
+        ? `<div class="th-preview" style="padding:0; overflow:hidden;"><img src="${p.thumbUrl}" style="width:100%; height:100%; object-fit:cover; border-radius:8px; display:block;" onerror="this.style.display='none'"/></div>`
+        : `<div class="th-preview">${escapeHtml(String(p.body || '').substring(0, 120))}${String(p.body || '').length > 120 ? '...' : ''}</div>`
+      }
+      <div class="th-title">${escapeHtml(p.title)}</div>
+      <div class="th-stats">
+        ${p.impressions ? `<span><span class="stat-val">${fmtNum(p.impressions)}</span> views</span>` : ''}
+        ${p.likes ? `<span><span class="stat-val">${p.likes}</span> likes</span>` : ''}
+        ${p.comments ? `<span><span class="stat-val">${p.comments}</span> comments</span>` : ''}
+        ${!p.impressions && !p.likes && !p.comments ? `<span>${p.type || 'Published'}</span>` : ''}
+        ${p.postUrl ? `<span style="margin-left:auto;"><a href="${p.postUrl}" target="_blank" rel="noopener" onclick="event.stopPropagation();" style="color:var(--green-primary); text-decoration:none; font-weight:700;">LinkedIn ↗</a></span>` : ''}
+      </div>
+    </div>
+  `).join('') || '<p style="font-family:var(--font-ui); color:var(--text-dim); text-align:center; padding:40px;">No top hits data available yet.</p>';
+  modal.classList.add('show');
+}
+function closeTopHitsModal() { document.getElementById('topHitsModal').classList.remove('show'); }
+
+// ═══════════════════════════════════════
+// TRANSCRIPTS (from Google Drive — Recorded Customer Calls)
+// ═══════════════════════════════════════
+const GDRIVE_TRANSCRIPTS = [
+  { id: '1qZHS44dZIeDnnjOd87Wb9L9zt41t9oKyW31to4B6lhw', name: 'Dylan Reach', date: '2026/02/23', type: 'Intro Call' },
+  { id: '1W-2Un6kiOykT0wev1qaq8W6NBVwO9fXlkBRTa6M2fPI', name: 'Chad Walter', date: '2026/02/16', type: 'Intro Call' },
+  { id: '1emNSXFNVsUKTaEG0_WYYnxq14oO8oKjeb5f0n1Lv598', name: 'Calvin Lowe', date: '2026/02/12', type: 'Deal Review Call' },
+  { id: '1QJe3nuscSqOLMUZRStG9_QX_cQB4NjjRQHr4rodHAAg', name: 'Calvin Lowe', date: '2026/01/21', type: 'Deal Flow Kickoff' },
+  { id: '1PeBMDaXX8usiBSbKXjcDYyMjB4pfX374f0QEXCVzyXg', name: 'Brendan Smith', date: '2026/01/08', type: 'Deal Flow Review' },
+  { id: '1cTj_boFmti8G6FPW9Kcd_RHz3NcEjbKz', name: 'Jake Cummins', date: '2026/01/08', type: 'CA Session 4' },
+  { id: '1kQmajrAYd52y2FHi4AWwQoKUIqoFqdV9TtpKr7NZgbo', name: 'Jake Cummins', date: '2025/12/15', type: 'CA Session 2' },
+  { id: '1xg5AgRODAb04qkZtfifWAHL8saN2T_7PTwtIz2xgLy8', name: 'Jake Cummins', date: '2025/12/15', type: 'CA Session 3' },
+  { id: '1kSApFoljylOBbNVaYAia53s18vPKSyCNAWM252u8bYk', name: 'Alex Lemieux', date: '2025/12/15', type: 'Deal Flow Kickoff' },
+  { id: '1d-hWdp3tIbYCPvnjHcwDmrcVsnARFFwBN-gjF-TkBLU', name: 'Brendan Smith', date: '2025/12/18', type: 'Deal Flow Kickoff' },
+  { id: '1hNSuZCal62nyx1RcFu2m-xL59NCeXdzXgQ8RAACIcUQ', name: 'Ian Powers', date: '2025/12/04', type: 'Q&A' },
+  { id: '1QmWdNzI16HgFQdYx7UD62C83DH5Q6w437ykdf_Mw5FI', name: 'Ian Powers', date: '2025/11/24', type: 'Intro Call' },
+  { id: '1mNl35cNFWkgWr_-3mkKV8TE7PPDjeADqHPdZtiICiOY', name: 'Jake Cummins', date: '2025/11/25', type: 'CA Session 2' },
+  { id: '1k31CsuXc4q2EzPHjv9gr61vYTAtLx2qH5AvfQixcTd8', name: 'Jake Cummins', date: '2025/11/18', type: 'CA Session 1' },
+  { id: '1RPQKzXQmCsngfaplOmHPoZ8XqdHN9kR9P4QZQHcgsyU', name: 'Jake Cummins', date: '2025/11/11', type: 'CA Onboarding' },
+  { id: '1v7uXGm__6k64yWKEEsijH32bIki5RSfrGNtX-kKU1zY', name: 'Hanna Jung', date: '2025/11/11', type: 'Intro Call' },
+  { id: '1c_CRyzjlLajzvcK2p6zlgjcEWXAYtCZe9xy6b_bR9So', name: 'Dan Frey', date: '2025/10/27', type: 'Intro Call' },
+  { id: '19mdI6Jgu7KwES8qtT7m5den1oWrhvJI7xUytKtPLqEo', name: 'Charlie Platt (Sale!)', date: '2025/10/24', type: 'Intro Call' },
+  { id: '1GzG-YTM0axw6i5syFk8GzBDLUn4o-BIQRM3Kj4zULpI', name: 'Henry Jaffe', date: '2025/10/24', type: 'Deal Review' },
+  { id: '1KkXT0H0UI1gIeDSbC6FuRi6YI-Z1OgZ1kq5kj_sYgn0', name: 'Alex Jacobs', date: '2025/10/22', type: 'Intro Call' },
+  { id: '1Oijql0CNmPgQusDQ00g8YjfQKQ14hIvqCkxxRZjRZms', name: 'Henry Jaffe', date: '2025/10/17', type: 'Buy Box Sprint' },
+  { id: '1ATiOLr4AlCjacXeHANlowfAKw25dz0HhIi-n5vHZCx4', name: 'Christine Kapanga', date: '2025/10/01', type: 'Intro Call' },
+  { id: '1aWTsQgKtC10vS8pqFP3i-uR3_VuzBtNEqUjqBIgSd9A', name: 'Anne Wagner', date: '2025/09/26', type: 'CA Session' },
+  { id: '1NzE4LVZQGSLvTmGB9SrnLmkUi84SrLwZQsVxtxIt-K4', name: 'Anne Wagner', date: '2025/09/08', type: 'CA Session 1' },
+  { id: '1svJgVaUZqHWZoO2_ev3hVMfV4nzGbSI3C54M7IIVcjQ', name: 'Colleen Wozny', date: '2025/08/25', type: 'Intro Call' },
+  { id: '16dNrxK1ouAw8fR34q3wXDasfMm18WbI1VV4134p3dOw', name: 'Brad Cornell', date: '2025/07/25', type: 'Intro Call' },
+  { id: '1CD2IJ4umbrqesjT95J5baAhZXc_m1SUk5em0oTPBJsc', name: 'Hisham', date: '2025/07/18', type: 'Intro Call' },
+  { id: '148rjWKjdFaqF2CQU8vZHECMEuLlSc1muk6tKL3ZPNUU', name: 'Hashaam Haider', date: '2025/07/17', type: 'Intro Call' },
+  { id: '1sNv9JyspNtyjT1qCvlDp8EWO4yL3KqG7zu4f24zqLnA', name: 'Brett Wischlow', date: '2025/07/17', type: 'Intro Call' },
+  { id: '1kkBoTeWnuhizjx5KhTL5uDpeNyS1yid_z-_sI3LBCnc', name: 'Hema', date: '2025/07/07', type: 'Intro Call' },
+  { id: '1_dXyC6mL0766vkh6f6wn_VWQgitERSj3nXzoNIFP4ps', name: 'Hoan Thai', date: '2025/07/02', type: 'Intro Call' },
+  { id: '1J31KiVrhlZBfcuStJV2dDeFVftNxO3FJo6B1Y3a383w', name: 'Guarav Dutta', date: '2025/06/25', type: 'Intro Call' },
+  { id: '1aXxbTXKMp85Ba6ni1QFeJUOOoAFnOxYpzi6NqBkmbjY', name: 'Dan Gwyn', date: '2025/06/17', type: 'Intro Call' },
+  { id: '1wBrRxjkVaWAlQv4WcYKOXhqAbpP2EA51w4OTGGcGrDY', name: 'Greg Layn', date: '2025/06/13', type: 'Intro Call' },
+  { id: '1ZE7ShCKJgHQChloio2NHYMPGj-urrOVDdTaroN3-2DA', name: 'Gavin Martella', date: '2025/06/10', type: 'Intro Call' },
+  { id: '1zdVhseoTrFchI5mUULS0kK4ejYb4xX_X0Dq8mcZi17s', name: 'Ian Johnston', date: '2025/06/12', type: 'CA Wrap Up' },
+  { id: '1u0o8oh6kSnY8xHrAhOR1D-5HfoI9A08pu9eXFX3YT2s', name: 'Ian Johnston', date: '2025/05/16', type: 'CA Session 2' },
+  { id: '1U8un_b-c5DI5WlRGn6rzvnu6UvoDBlOMQNuKG8Kw7NI', name: 'Brian Barger', date: '2025/05/27', type: 'Intro Call' },
+  { id: '1k8Fi8e7QhQil903dPJygdEmJ2O3_uzdmCbOXw3gxGDA', name: 'Christine Song', date: '2025/05/22', type: 'Intro Call' },
+  { id: '1gcaHJlfnDBNHYWaaIxkkau1j0YNZrmrL2UR1cExlyfc', name: 'Ian Johnston', date: '2025/04/28', type: 'CA Session' },
+  { id: '1oEiw85wIPHcvYycsSkegG--NHIFKJzrOc8mhYgSiGHc', name: 'Ian Johnston', date: '2025/03/27', type: 'CA Session' },
+  { id: '1TiMOrG970WctjSPdaj4skBxoOEVW3RW7hNT6i7IYMvw', name: 'Ian Johnston', date: '2025/03/20', type: 'CA Session 1' },
+  { id: '1HDlOjZso5W0kZ_FY2Q9z86m0gKRVpUuk-Rqjxzxr1ao', name: 'Ian Johnston', date: '2025/03/12', type: 'CA Onboarding #2' },
+  { id: '1Bea51gek6fzc-U33LEGmHmD22GHa7KIb9-FW9DVy078', name: 'Ian Johnston', date: '2025/03/04', type: 'CA Onboarding' },
+  { id: '1eNCY8zlLjxhGYocpZA04xJ4WnQkFsx-MBUYIQMUyQ8E', name: 'Ian Johnston', date: '2025/03/03', type: 'Intro Call' },
+];
+
+function renderTranscripts() {
+  const container = document.getElementById('transcriptList');
+  const transcripts = GDRIVE_TRANSCRIPTS;
+
+  let html = '<div style="padding:6px 12px; font-family:var(--font-ui); font-size:10px; font-weight:700; text-transform:uppercase; letter-spacing:1px; color:var(--text-dim);">Google Drive — Recorded Customer Calls</div>';
+  transcripts.forEach((t, i) => {
+    const sel = STATE.selectedTranscriptIdx === i ? ' selected' : '';
+    html += `<div class="transcript-item${sel}" onclick="selectGDriveTranscript(${i})">
+      <div class="ti-title">${escapeHtml(t.name)} — ${t.type}</div>
+      <div class="ti-date">${t.date}</div>
+    </div>`;
+  });
+  container.innerHTML = html;
+  STATE.transcripts = transcripts;
+}
+
+function selectGDriveTranscript(idx) {
+  STATE.selectedTranscriptIdx = idx;
+  const t = GDRIVE_TRANSCRIPTS[idx];
+  if (!t) return;
+  STATE.selectedTranscript = { fields: { 'Description': t.name + ' — ' + t.type + ' (' + t.date + ')', 'Title / Hook': t.name + ' — ' + t.type }, gdrive: t };
+
+  const snippet = document.getElementById('transcriptSnippet');
+  snippet.innerHTML = '<div style="text-align:center; padding:16px; color:var(--text-dim); font-family:var(--font-ui); font-size:12px;"><div class="spinner" style="margin:0 auto 8px;"></div>Loading transcript...</div>';
+
+  // Fetch transcript content from Google Drive via the doc URL
+  fetchGDriveTranscript(t.id).then(text => {
+    STATE.selectedTranscript.fields['Transcript'] = text;
+    snippet.textContent = text.substring(0, 3000) + (text.length > 3000 ? '...' : '');
+  }).catch(() => {
+    snippet.innerHTML = `<div style="font-family:var(--font-ui); font-size:12px; color:var(--text-dim); text-align:center; padding:12px;">
+      <p style="margin-bottom:8px;">Transcript selected: <strong>${escapeHtml(t.name)}</strong></p>
+      <a href="https://docs.google.com/document/d/${t.id}/edit" target="_blank" style="color:var(--green-primary); font-weight:700; text-decoration:none;">Open in Google Docs ↗</a>
+    </div>`;
+  });
+
+  renderTranscripts();
+  updateSelectionsSummary();
+}
+
+async function fetchGDriveTranscript(docId) {
+  // Try fetching via Google Docs export URL (works if doc is shared)
+  const url = `https://docs.google.com/document/d/${docId}/export?format=txt`;
+  try {
+    const resp = await fetch(url);
+    if (resp.ok) {
+      return await resp.text();
+    }
+  } catch(e) { /* fall through */ }
+  throw new Error('Cannot fetch — open in Google Docs');
+}
+
+// ═══════════════════════════════════════
+// WRITING STYLE PICKER
+// ═══════════════════════════════════════
+function renderStylePicker() {
+  const grid = document.getElementById('stylePickerGrid');
+  const swipes = STATE.swipeFile || [];
+  // Show pinned first, then others — max 6
+  const sorted = [...swipes].sort((a, b) => (b.pinned ? 1 : 0) - (a.pinned ? 1 : 0)).slice(0, 6);
+  grid.innerHTML = sorted.map((s, i) => `
+    <div class="style-card ${STATE.selectedStyle === i ? 'selected' : ''}" onclick="selectStyle(${i})">
+      <div class="sc-author">${s.pinned ? '&#128204; ' : ''}${escapeHtml(s.author)}</div>
+      <div class="sc-snippet">"${escapeHtml(s.text.substring(0, 60))}..."</div>
+    </div>
+  `).join('') || '<div style="font-family:var(--font-ui); font-size:12px; color:var(--text-dim); padding:8px;">Add swipe posts in the Swipe File tab first.</div>';
+}
+
+function selectStyle(idx) {
+  STATE.selectedStyle = STATE.selectedStyle === idx ? null : idx;
+  renderStylePicker();
+  updateSelectionsSummary();
+}
+
+// ═══════════════════════════════════════
+// TEMPLATE PICKER
+// ═══════════════════════════════════════
+function selectTemplate(el, tmpl) {
+  if (STATE.selectedTemplate === tmpl) {
+    STATE.selectedTemplate = null;
+    el.classList.remove('selected');
+  } else {
+    STATE.selectedTemplate = tmpl;
+    document.querySelectorAll('.template-chip').forEach(c => c.classList.remove('selected'));
+    el.classList.add('selected');
+  }
+  updateSelectionsSummary();
+}
+
+// ═══════════════════════════════════════
+// SELECTIONS SUMMARY & POST GENERATION
+// ═══════════════════════════════════════
+function updateSelectionsSummary() {
+  const el = document.getElementById('selectionsSummary');
+  const parts = [];
+  if (STATE.selectedTranscript) {
+    const title = fieldStr(STATE.selectedTranscript.fields, 'Title / Hook') || fieldStr(STATE.selectedTranscript.fields, 'Description') || 'Transcript';
+    parts.push(`<span style="display:inline-flex; align-items:center; gap:4px; padding:4px 10px; border-radius:12px; background:rgba(81,190,123,0.12); font-family:var(--font-ui); font-size:11px; font-weight:600; color:#2D8A50;">Transcript: ${escapeHtml(title.substring(0, 30))}</span>`);
+  }
+  if (STATE.selectedTemplate) {
+    const names = { 'story': 'Story Arc', 'listicle': 'Listicle', 'hot-take': 'Hot Take', 'case-study': 'Case Study', 'framework': 'Framework', 'myth-bust': 'Myth Buster', 'before-after': 'Before/After', 'lesson': 'Lesson Learned' };
+    parts.push(`<span style="display:inline-flex; align-items:center; gap:4px; padding:4px 10px; border-radius:12px; background:rgba(212,138,48,0.08); font-family:var(--font-ui); font-size:11px; font-weight:600; color:var(--orange);">Template: ${names[STATE.selectedTemplate] || STATE.selectedTemplate}</span>`);
+  }
+  el.innerHTML = parts.length ? parts.join('') : '<span style="font-family: var(--font-ui); font-size: 11px; color: var(--text-dim);">Select ingredients from the right panel, then click "Generate Post"</span>';
+}
+
+const TEMPLATES = {
+  'story': { name: 'Story Arc', structure: ['Hook (surprising statement)', 'Backstory (set the scene)', 'Tension (the problem)', 'Resolution (what I learned/did)', 'Takeaway (actionable lesson)'] },
+  'listicle': { name: 'Listicle', structure: ['Bold hook', 'Point 1', 'Point 2', 'Point 3', 'Point 4', 'Point 5', 'Summary line'] },
+  'hot-take': { name: 'Hot Take', structure: ['Contrarian opening', 'Why most people are wrong', 'Your evidence', 'The reframe', 'What to do instead'] },
+  'case-study': { name: 'Case Study', structure: ['Client result headline', 'Starting situation', 'What we did', 'The outcome (numbers)', 'Key lesson'] },
+  'framework': { name: 'Framework', structure: ['Name the framework', 'Why it matters', 'Step 1', 'Step 2', 'Step 3', 'How to start today'] },
+  'myth-bust': { name: 'Myth Buster', structure: ['State the myth', 'Why people believe it', 'The truth (with evidence)', 'What to do instead'] },
+  'before-after': { name: 'Before/After', structure: ['Paint the "before"', 'The turning point', 'Paint the "after"', 'The 1-2 changes that mattered'] },
+  'lesson': { name: 'Lesson Learned', structure: ['The lesson (1 line)', 'The story behind it', 'What didn\'t work', 'What finally worked', 'Advice for others'] },
+};
+
+const HOOK_PATTERNS = {
+  'dream-math': {
+    name: 'Dream Outcome Math',
+    examples: [
+      'Want $10,000/month in passive income by age 55?\n\nHere\'s exactly how I\'d do it starting at 40:',
+      'Want your $5,000/month mortgage covered for life?\n\nHere\'s the math.',
+      'Want to replace your $200K salary with passive income?\n\nHere\'s how much you really need to invest.',
+    ],
+    image: 'Calculator visual or income breakdown chart with GYC branding',
+  },
+  'pain-gap': {
+    name: 'Pain + Gap',
+    examples: [
+      'You\'re smart enough to earn $200K+/year.\n\nBut wiring $50K into a deal still feels like a shot in the dark.',
+      'If you\'re writing $50K-$250K checks into real estate deals personally and you don\'t have a holding company...\n\nI can almost guarantee you\'re overpaying on taxes.',
+    ],
+    image: 'Professional photo of you working — relatable, not flashy',
+  },
+  'specific-person': {
+    name: 'Specific Person Story',
+    examples: [
+      'I spoke with a medical sales rep earning $400,000 who only saw his kids 30 minutes a day.',
+      'I know a dentist with 12 offices.\n\nHe turns every $1 of income into $1+ of tax write-offs.\n\nHere\'s his secret:',
+    ],
+    image: 'Photo of you on a call or in a meeting — authentic moment',
+  },
+  'confession': {
+    name: 'Confession / Origin',
+    examples: [
+      'In Feb \'22, I invested $50K in a self-storage deal that checked every box.\n\nHere\'s what happened next.',
+      'When the sheriff illegally boarded up my house, I knew I was in trouble.\n\nBut I didn\'t expect it to cost $40,000.',
+      'Everyone dumped Royal Caribbean during COVID in 2020.\n\nBut I was loading up.',
+    ],
+    image: 'Candid photo or throwback — vulnerability builds trust',
+  },
+  'big-scary': {
+    name: 'Big Scary Statement',
+    examples: [
+      'Your 6-figure salary is going to disappear.',
+      'Private real estate fundraising just fell off a cliff.',
+      'The wildest part of today\'s capital raising game?\n\nThe guy you invested with started last year.',
+    ],
+    image: 'Bold text on dark background — make it thumb-stopping',
+  },
+  'comparison': {
+    name: 'Comparison',
+    examples: [
+      'Where you park $100K matters.\n\nI compared 5 options.\n\n1 made $10K/yr more.',
+      'Two funds. One shows 18% IRR on paper. The other shows 8% cash yield.\n\nWhich one do you pick?',
+    ],
+    image: 'Side-by-side comparison graphic or simple chart',
+  },
+  'most-vs-best': {
+    name: 'Most vs Best',
+    examples: [
+      'Most investors start with spreadsheets.\n\nThe best ones start with boots on the ground.',
+      'Most LPs obsess over picking the right deal.\n\nThey completely ignore how they\'re structured.',
+    ],
+    image: 'Clean text graphic — the contrast IS the visual',
+  },
+  'lie-reframe': {
+    name: 'Lie / Reframe',
+    examples: [
+      'The Cash Flow Lie No One Talks About in Apartment Investing.',
+      'Everyone\'s hyping Trump\'s bill.\n\nBut here\'s what they\'re not telling you:',
+    ],
+    image: 'Bold headline graphic or carousel debunking the myth',
+  },
+  'scene-feeling': {
+    name: 'Scene + Feeling',
+    examples: [
+      'I was on a chairlift with my buddy Aaron talking about why I only delegate right before a trip.',
+      'He FaceTimed me from his car between shifts.\n\nStill in his scrubs, phone pressed to his ear, exhaustion in his voice.',
+    ],
+    image: 'Lifestyle photo that matches the scene — Miami, travel, real moments',
+  },
+  'list-secrets': {
+    name: 'List / Secrets',
+    examples: [
+      '7 secrets millionaires use to earn $10K+/mo passively (after they stop working)',
+      'I went from $0 to $250K/year in passive income.\n\nHere\'s exactly how I\'d do it again:',
+    ],
+    image: 'Numbered list graphic or carousel with key points',
+  },
+  'student-question': {
+    name: 'Student Question',
+    examples: [
+      '"I\'ve got a shortlist of three funds to invest in... how do I figure out which one is the best fit?"\n\nA student asked me this last week.',
+      '"What app do you guys use to invest?"\n\nSomeone asked me this the other day.',
+    ],
+    image: 'Screenshot of a real DM or question (blurred name) — social proof',
+  },
+};
+
+function selectHookPattern(el, pattern) {
+  if (STATE.selectedHookPattern === pattern) {
+    STATE.selectedHookPattern = null;
+    el.classList.remove('selected');
+  } else {
+    STATE.selectedHookPattern = pattern;
+    document.querySelectorAll('#hookPatternChips .template-chip').forEach(c => c.classList.remove('selected'));
+    el.classList.add('selected');
+  }
+  updateSelectionsSummary();
+}
+
+function toggleGuidelinesPanel() {
+  const p = document.getElementById('guidelinesPanel');
+  p.style.display = p.style.display === 'none' ? 'block' : 'none';
+}
+
+function getActiveRules() {
+  const rules = [];
+  if (document.getElementById('rule-oneIdea')?.checked) rules.push('one-idea');
+  if (document.getElementById('rule-plainLang')?.checked) rules.push('plain-language');
+  if (document.getElementById('rule-reframe')?.checked) rules.push('reframe');
+  if (document.getElementById('rule-shareable')?.checked) rules.push('shareable');
+  if (document.getElementById('rule-formatting')?.checked) rules.push('formatting');
+  if (document.getElementById('rule-strongEnd')?.checked) rules.push('strong-end');
+  if (document.getElementById('rule-noCTA')?.checked) rules.push('no-cta');
+  if (document.getElementById('rule-conviction')?.checked) rules.push('conviction');
+  if (document.getElementById('rule-noForcedNeg')?.checked) rules.push('no-forced-neg');
+  return rules;
+}
+
+function extractTranscriptInsights(rawText) {
+  // Step 1: Split into paragraphs (join lines that belong together)
+  const rawLines = rawText.split(/\r?\n/);
+  const paragraphs = [];
+  let current = '';
+  for (const line of rawLines) {
+    const trimmed = line.trim();
+    if (trimmed.length === 0) {
+      if (current.length > 0) { paragraphs.push(current.trim()); current = ''; }
+    } else {
+      current += (current ? ' ' : '') + trimmed;
+    }
+  }
+  if (current.length > 0) paragraphs.push(current.trim());
+
+  // Step 2: Filter junk paragraphs
+  const junkPatterns = [
+    /^📝/i, /^meeting\b/i, /^summary$/i, /^action\s*items?/i, /^transcript$/i,
+    /^recording$/i, /^rate these/i, /^no suggested/i, /^you should review/i,
+    /^please provide feedback/i, /^##\s/, /^\*\s/,
+    /^(jan|feb|mar|apr|may|jun|jul|aug|sep|oct|nov|dec)\s+\d/i,
+    /meeting records/i, /^get tips and learn/i,
+    /google meet/i, /zoom/i, /screen share/i, /can you hear me/i,
+    /\bmute\b/i, /\bunmute\b/i, /hold on a sec/i, /sorry about that/i,
+    /\bcalendar\b/i, /\bgemini\b/i, /recording started/i,
+    /^\w+\s+(joined|left)\b/i,
+    /editable transcript/i, /computer generated/i, /might contain errors/i,
+    /people can also change/i, /text after it was created/i,
+    /suggested next steps/i, /notes to make sure/i, /camera.*unavailable/i,
+    /^details\s+decisions/i, /^rate these decisions/i, /^helpful or not/i,
+    /^needs further discussion/i, /^key (topics|points|takeaways|decisions)/i,
+    /^NEEDS FURTHER/i, /^next steps/i, /^follow.up items/i,
+    /^\w+ \w+ overview$/i, /^investment strategy/i,
+    /^(ALIGNED|NOT ALIGNED|PARTIALLY ALIGNED|CONSENSUS)\s*$/i,
+    /^(overview|limitations|discussion|strategy|analysis|summary|defined|structure)$/i,
+    /^\w+\s+(overview|limitations|defined|structure|model)$/i
+  ];
+
+  // Build a list of participant names by finding repeated speaker labels (Name Name: appears 2+ times)
+  const nameCountMap = {};
+  const namePattern = /([A-Z][a-z]+\s+[A-Z][a-z]+):/g;
+  paragraphs.forEach(p => {
+    let m;
+    while ((m = namePattern.exec(p)) !== null) {
+      nameCountMap[m[1]] = (nameCountMap[m[1]] || 0) + 1;
+    }
+  });
+  const detectedNames = new Set(Object.entries(nameCountMap).filter(([_, count]) => count >= 3).map(([name]) => name));
+
+  const cleaned = paragraphs
+    .filter(l => l.length > 40)
+    .filter(l => !junkPatterns.some(p => p.test(l)))
+    // Strip speaker labels globally (with colon) — "Pascal Wagner: text" → "text"
+    .map(l => l.replace(/[A-Z][a-z]+ [A-Z][a-z]+:\s*/g, ''))
+    // Strip detected participant names without colons — "Pascal Wagner and Brendan Smith met" → "met"
+    .map(l => {
+      let s = l;
+      detectedNames.forEach(name => {
+        s = s.replace(new RegExp('\\b' + name.replace(/\s+/g, '\\s+') + '\\b', 'gi'), '');
+      });
+      return s.replace(/\s{2,}/g, ' ').replace(/^\s*(and|,)\s*/i, '').trim();
+    })
+    .map(l => l.replace(/\(\d{2}:\d{2}(:\d{2})?\)/g, '').trim()) // strip timestamps
+    // Strip inline * markers from Gemini notes
+    .map(l => l.replace(/\s*\*\s+/g, '. ').replace(/^\.\s*/, '').trim())
+    .filter(l => l.length > 40);
+
+  // Step 3: Strip Gemini section headers and decision tags from the start of paragraphs
+  const headerWords = /^(Overview|Limitations|Discussion|Strategy|Analysis|Summary|Defined|Structure|Model|Approach|Framework|Process|Enrollment|Review|Assessment|Considerations|Implications|Rationale|Recommendation|Conclusion|Background|Context|Details|Update|Status|Progress|Challenges|Opportunities|Insights|Takeaways|Highlights|Action|Decision|Resolution|Consensus|Alignment|Impact|Outcome|Result)\b/i;
+  const stripped = cleaned.map(l => {
+    let s = l;
+    // Strip "Summary TopicName Header ActualContent"
+    s = s.replace(/^Summary\s+/i, '');
+    // Strip Gemini decision alignment tags: "ALIGNED *", "NOT ALIGNED *", etc.
+    s = s.replace(/^(ALIGNED|NOT ALIGNED|PARTIALLY ALIGNED|CONSENSUS|NO CONSENSUS)\s*\*?\s*/i, '');
+    s = s.replace(/^NEEDS FURTHER DISCUSSION\s*\*?\s*/i, '');
+    // Strip bullet markers
+    s = s.replace(/^\*\s+/g, '');
+    // Repeatedly strip leading header-like words until we reach real content
+    let prevLen = 0;
+    while (s.length !== prevLen && s.length > 40) {
+      prevLen = s.length;
+      // Strip known topic phrases
+      s = s.replace(/^(Cash Flow Academy|Investment Strategy|Feeder Fund|Coaching Program|Fund of Funds|Portfolio Strategy|Deal Review|Operator Analysis|Capital Deployment|Asset Class|Gray'?s?\s+Coaching|Mastermind Program|Due Diligence|Buy Box|Investment Criteria|Fundraising)\s*/i, '');
+      // Strip header words
+      s = s.replace(headerWords, '');
+      // Strip bullet markers
+      s = s.replace(/^\*\s+/g, '');
+      s = s.trim();
+    }
+    // After stripping known headers, detect remaining "Title Case Header Sentence" pattern.
+    // Gemini uses Title Case headers like "Shift to Debt Fund Investment" followed by content.
+    // Strategy: find where a run of Title Case words (with small connectors) ends and content begins.
+    const words = s.split(/\s+/);
+    const smallWords = new Set(['to','of','for','and','in','on','the','a','an','by','with','from','is','as','or','at','but']);
+    let headerEnd = 0;
+    for (let i = 0; i < Math.min(words.length, 8); i++) {
+      const w = words[i];
+      if (/^[A-Z]/.test(w) || smallWords.has(w.toLowerCase())) {
+        // Could still be header — but check if this word starts a sentence (followed by lowercase)
+        if (i > 1 && /^[A-Z]/.test(w) && i + 1 < words.length && /^[a-z]/.test(words[i + 1]) && !smallWords.has(words[i + 1].toLowerCase())) {
+          // "The discussion centered..." — "The" is header-like but "discussion" is lowercase content
+          // Actually "The" + lowercase = sentence start, break here
+          headerEnd = i;
+          break;
+        }
+        headerEnd = i + 1;
+      } else {
+        // Lowercase non-small word = content has started
+        if (i > 0) headerEnd = i;
+        break;
+      }
+    }
+    if (headerEnd >= 2 && headerEnd < words.length) {
+      s = words.slice(headerEnd).join(' ');
+    }
+    // Strip leading conjunctions/fragments left after name/header removal
+    s = s.replace(/^\s*(and|but|or|,|;)\s+/i, '').trim();
+    // Clean "met to review" → "A review of" (after name stripping "X and Y met to review" → "met to review")
+    s = s.replace(/^met to (review|discuss|analyze|evaluate)\s+/i, 'A review of ');
+    s = s.replace(/^outlined the\b/i, 'The');
+    s = s.replace(/^expressed\s+(concerns?|interest)\s+(about|in|regarding)\s+/i, 'Concerns about ');
+    s = s.replace(/^chosen by using\b/i, 'Using');
+    // If it starts with a lowercase word after stripping, capitalize it
+    if (s.length > 0 && /^[a-z]/.test(s)) {
+      s = s.charAt(0).toUpperCase() + s.slice(1);
+    }
+    return s.trim();
+  }).filter(l => l.length > 40);
+
+  // Separate into summaries (written/analytical) vs dialogue (conversational/speech)
+  const summariesRaw = stripped.filter((l, idx) => {
+    if (l.length < 60 || l.length > 800) return false;
+    if (!/^[A-Z]/.test(l)) return false;
+    if (/\b(\w+)\s+\1\b/i.test(l)) return false;
+    if (/,\s*,/.test(l)) return false;
+    const speechWords = (l.match(/\b(um|uh|yeah|okay|gonna|gotta|wanna|kinda|sorta)\b/gi) || []).length;
+    if (speechWords > 1) return false;
+    if (/\b(and|but|so|or)\s*$/i.test(l)) return false;
+    if (/\*/.test(l)) return false;
+    if (/\b(will research|will request|will perform|will schedule|will follow up|enrollment|enroll)\b/i.test(l)) return false;
+    if (/\bsystemized (process|system)\b/i.test(l)) return false;
+    return true;
+  });
+
+  // Step 4: Clean meeting-note language so summaries read naturally for social posts
+  const summaries = summariesRaw.map(l => {
+    return l
+      // Strip meeting-note openers
+      .replace(/^The discussion (focused on|centered on|centered around|covered|addressed|revolved around|was about)\s+/i, '')
+      .replace(/^A consensus was reached (regarding|on|about|that)\s+/i, '')
+      .replace(/^(Participants|The group|The team|Members|Attendees)\s+(noted|agreed|discussed|highlighted|emphasized|acknowledged|recognized|confirmed|identified|concluded)\s+(that\s+)?/i, '')
+      .replace(/^It was (noted|agreed|decided|determined|concluded|emphasized|highlighted|acknowledged|recognized)\s+(that\s+)?/i, '')
+      .replace(/^There was (a |an )?(discussion|conversation|consensus|agreement|debate)\s+(about|regarding|on|around)\s+/i, '')
+      // Strip passive "were noted/discussed" mid-sentence openers
+      .replace(/^[\w\s]{0,40}?\b(were|was)\s+(noted|discussed|highlighted|emphasized|mentioned|addressed|raised)\b,?\s*/i, '')
+      // Strip "Challenges in X were noted, specifically Y" → "Y"
+      .replace(/^[\w\s]{0,60}?\bwere noted,?\s*(specifically|particularly|especially|notably)\s+/i, '')
+      // Strip "Separately, ..." from compound sentences
+      .replace(/\.\s*Separately,\s+.*$/i, '.')
+      // Strip internal program names
+      .replace(/\b(the )?Cash Flow Academy (program|process|system)\b/gi, 'the process')
+      .replace(/\bCash Flow Academy\b/gi, 'the program')
+      .replace(/\bCFA program\b/gi, 'the program')
+      .replace(/\b(a |the )?(12-month )?mastermind program\b/gi, 'the coaching program')
+      // Strip participant names — replace with generic references
+      .replace(/\b(Pascal Wagner|Brendan Smith|Calvin Lowe|Dylan Reach|Gray\s+\w+|Jake Cummins|Alex Lemieux)\s+(and\s+)?(Pascal Wagner|Brendan Smith|Calvin Lowe|Dylan Reach|Gray\s+\w+|Jake Cummins|Alex Lemieux\s+)?/gi, '')
+      .replace(/\b(Pascal|Wagner|Brendan|Calvin|Dylan|Gray|Jake|Alex|Lemieux|Cummins|Lowe|Reach|Smith)\s+(Wagner|Smith|Lowe|Reach|Cummins|Lemieux)?\s*/gi, (match) => {
+        // Only strip if it looks like a name (first + optional last), not a common word
+        if (/^(Gray)\s*$/i.test(match.trim())) return match; // "Gray" alone could be a color
+        return '';
+      })
+      // Clean up leftover "met to review" → "A review of"
+      .replace(/^\s*met to (review|discuss|analyze)\s+/i, 'A review of ')
+      .replace(/^\s*outlined the\b/i, 'The')
+      // Fix doubled words from name/program replacement (e.g. "the the")
+      .replace(/\b(the|a|an|in|on|of|to|for|and|is|was)\s+\1\b/gi, '$1')
+      // Strip internal process/program descriptions
+      .replace(/^The process,?\s+which aims to provide clients with\s+/i, '')
+      .replace(/\bprovide clients with\b/gi, 'build')
+      .replace(/\bclients\b/gi, 'investors')
+      .replace(/\baccelerating their understanding of the investment framework\b/gi, 'getting up to speed on deal analysis')
+      .replace(/\bby quickly completing three successful deal reviews\b/gi, 'by reviewing real deals')
+      // Capitalize first letter after stripping
+      .replace(/^[a-z]/, c => c.toUpperCase())
+      .trim();
+  }).filter(l => {
+    if (l.length <= 40) return false;
+    // Reject fragments starting with adverbs/conjunctions (leftover from stripped phrases)
+    if (/^(Specifically|Particularly|Notably|Additionally|Furthermore|Moreover|Separately|However)\b/i.test(l) && l.length < 120) return false;
+    return true;
+  });
+
+  const dialogue = stripped.filter(l => l.length > 40 && l.length < 200);
+
+  // Extract key topics by finding frequently mentioned words (excluding common words)
+  const stopWords = new Set(['the','a','an','and','or','but','in','on','at','to','for','of','with','by','from','is','are','was','were','be','been','being','have','has','had','do','does','did','will','would','could','should','may','might','shall','can','that','this','these','those','it','its','they','their','them','we','our','us','he','she','him','her','his','you','your','i','my','me','not','no','so','if','as','than','about','also','just','very','more','most','some','any','all','each','every','into','over','such','what','which','who','how','when','where','why','much','many','own','same','other','new','one','two','three','well','like','know','get','got','going','went','said','noted','mentioned','discussed','focused','need','make','made','really','think','right','yeah','okay','um','uh']);
+  const wordCounts = {};
+  stripped.join(' ').toLowerCase().split(/\W+/).forEach(w => {
+    if (w.length > 3 && !stopWords.has(w)) wordCounts[w] = (wordCounts[w] || 0) + 1;
+  });
+  const topWords = Object.entries(wordCounts).sort((a, b) => b[1] - a[1]).slice(0, 15).map(e => e[0]);
+
+  return { summaries, dialogue, topWords, hasContent: summaries.length > 0 || dialogue.length > 0 };
+}
+
+function generatePost() {
+  const rawTranscript = STATE.selectedTranscript ? (STATE.selectedTranscript.fields['Transcript'] || '') : '';
+  const hasTranscript = rawTranscript.length > 100;
+  const insights = hasTranscript ? extractTranscriptInsights(rawTranscript) : { summaries: [], dialogue: [], topWords: [], hasContent: false };
+
+  const swipes = [...(STATE.swipeFile || [])].sort((a, b) => (b.pinned ? 1 : 0) - (a.pinned ? 1 : 0)).slice(0, 6);
+  const style = STATE.selectedStyle != null ? swipes[STATE.selectedStyle] : null;
+  const tmpl = STATE.selectedTemplate ? TEMPLATES[STATE.selectedTemplate] : null;
+  const hookPattern = STATE.selectedHookPattern ? HOOK_PATTERNS[STATE.selectedHookPattern] : null;
+  const rules = getActiveRules();
+  const skipCTA = rules.includes('no-cta');
+
+  const pick = (arr) => arr.length ? arr[Math.floor(Math.random() * arr.length)] : '';
+  const pickUnique = (arr, exclude) => { const filtered = arr.filter(x => x !== exclude); return filtered.length ? pick(filtered) : pick(arr); };
+  // Truncate at word boundary, ending at a sentence or clause break if possible
+  const trunc = (str, max) => {
+    if (str.length <= max) return str;
+    let cut = str.substring(0, max);
+    // Try to cut at a sentence end
+    const sentEnd = Math.max(cut.lastIndexOf('. '), cut.lastIndexOf('! '), cut.lastIndexOf('? '));
+    if (sentEnd > max * 0.5) return cut.substring(0, sentEnd + 1);
+    // Cut at last space
+    const sp = cut.lastIndexOf(' ');
+    return sp > max * 0.5 ? cut.substring(0, sp) : cut;
+  };
+
+  // Build insight lines from transcript — real content, no file names
+  const s = insights.summaries;
+  const d = insights.dialogue;
+
+  // Determine the hook
+  let hook = '';
+  if (hookPattern) {
+    hook = pick(hookPattern.examples);
+  } else if (insights.hasContent && (s.length || d.length)) {
+    // Use a clean summary or short insight as hook — never raw messy dialogue
+    const hookCandidates = s.filter(l => l.length > 40 && l.length < 140);
+    if (hookCandidates.length) {
+      hook = pick(hookCandidates);
+    } else {
+      const cleanD = d.filter(l => l.length > 40 && l.length < 120 && /^[A-Z]/.test(l) && !/\b(\w+)\s+\1\b/.test(l));
+      hook = cleanD.length ? pick(cleanD) : (s.length ? pick(s).substring(0, 120) : '');
+    }
+  } else {
+    hook = 'Want $10,000/month in passive income by age 55?\n\nHere\'s exactly how I\'d do it:';
+  }
+
+  // Build a clean, ready-to-post LinkedIn post
+  let post = hook + '\n\n';
+
+  if (insights.hasContent) {
+    // We have real transcript content — build post around it
+    // ONLY use summaries (clean, analytical) for post body — never raw dialogue
+    const mainInsight = s.length ? pick(s) : '';
+    const supportInsight = s.length > 1 ? pickUnique(s, mainInsight) : (s.length === 1 ? '' : '');
+    const thirdInsight = s.length > 2 ? pickUnique(s, mainInsight + supportInsight) : '';
+    // Only use dialogue for short quoted lines — VERY strict filtering
+    const cleanDialogue = d.filter(l => {
+      // Must start with uppercase letter or quote
+      if (!/^[A-Z"']/.test(l)) return false;
+      // No stuttering or false starts
+      if (/\b(\w+)\s+\1\b/i.test(l)) return false;
+      if (/\b\w\s+\w{3,}\b/.test(l)) return false; // "h happy", "s something"
+      // No messy punctuation
+      if (/,\s*,/.test(l)) return false;
+      if ((l.match(/,/g) || []).length > 3) return false;
+      // No incomplete endings
+      if (/\b(ha|don|tha|wha|ye|yo|an)\s*$/.test(l)) return false;
+      if (/[,]\s*$/.test(l)) return false;
+      // No pleasantries or logistics
+      if (/\b(appreciate|thank|email|watch for|talk soon|good to meet|nice to|bye|take care|sorry|hold on)\b/i.test(l)) return false;
+      // No meta-discussion about the call itself
+      if (/\b(google meet|zoom|screen share|can you hear|mute|recording|transcript)\b/i.test(l)) return false;
+      // No internal program references or action items
+      if (/\b(will research|will request|will perform|will schedule|will follow up|enrollment|enroll)\b/i.test(l)) return false;
+      // Require substance — at least 8 words
+      if (l.split(/\s+/).length < 8) return false;
+      // Must sound like a complete thought (ends with period, question mark, or is a strong statement)
+      if (!/[.!?"]$/.test(l) && l.length < 80) return false;
+      return true;
+    });
+    const dialogueLine = cleanDialogue.length ? pick(cleanDialogue) : '';
+
+    if (tmpl && tmpl.name === 'Story Arc') {
+      if (dialogueLine) {
+        post += `On a recent call, someone said something that stuck with me:\n\n`;
+        post += `"${trunc(dialogueLine, 180)}"\n\n`;
+        post += `Here's why this matters:\n\n`;
+      } else {
+        post += `Something came up on a call recently that I can't stop thinking about.\n\n`;
+      }
+      if (mainInsight) post += `${trunc(mainInsight, 280)}\n\n`;
+      if (supportInsight) post += `${trunc(supportInsight, 250)}\n\n`;
+      post += `This is the kind of thing that only clicks once you've seen it play out in real deals.`;
+    } else if (tmpl && tmpl.name === 'Listicle') {
+      const items = s.slice(0, 5);
+      items.forEach((q, i) => { post += `${i + 1}. ${trunc(q, 160)}\n\n`; });
+      post += `These aren't theories. They came up in a real conversation this week.`;
+    } else if (tmpl && tmpl.name === 'Hot Take') {
+      if (mainInsight) post += `${trunc(mainInsight, 250)}\n\n`;
+      post += `Most people won't say this out loud.\n\n`;
+      if (supportInsight) post += `${trunc(supportInsight, 200)}\n\n`;
+      post += `But if you've been doing this long enough, you know it's true.`;
+    } else if (tmpl && tmpl.name === 'Case Study') {
+      if (dialogueLine) post += `"${trunc(dialogueLine, 180)}"\n\n`;
+      post += `Here's what actually happened:\n\n`;
+      if (mainInsight) post += `${trunc(mainInsight, 250)}\n\n`;
+      if (supportInsight) post += `${trunc(supportInsight, 200)}\n\n`;
+      post += `The lesson? Process beats prediction. Every time.`;
+    } else if (tmpl && tmpl.name === 'Framework') {
+      const steps = s.slice(0, 3);
+      if (steps.length >= 2) {
+        steps.forEach((step, i) => { post += `Step ${i + 1}: ${trunc(step, 160)}\n\n`; });
+      } else {
+        if (mainInsight) post += `${trunc(mainInsight, 250)}\n\n`;
+        if (supportInsight) post += `${trunc(supportInsight, 200)}\n\n`;
+      }
+      post += `Simple? Yes. Easy? No.\n\n`;
+      post += `But this is what separates people who talk about investing from people who actually do it.`;
+    } else if (tmpl && tmpl.name === 'Myth Buster') {
+      post += `It sounds right.\nIt looks right.\nEveryone repeats it.\n\n`;
+      post += `But it's wrong.\n\n`;
+      if (mainInsight) post += `${trunc(mainInsight, 250)}\n\n`;
+      if (supportInsight) post += `${trunc(supportInsight, 200)}\n\n`;
+      post += `The truth is simpler than the narrative.`;
+    } else if (tmpl && tmpl.name === 'Before/After') {
+      post += `Before:\n`;
+      if (cleanDialogue.length >= 2) {
+        post += `- ${trunc(cleanDialogue[0], 120)}\n`;
+        post += `- ${trunc(cleanDialogue[1], 120)}\n\n`;
+      } else {
+        post += `- Overthinking every deal\n- Stuck in analysis paralysis\n\n`;
+      }
+      post += `After:\n`;
+      if (mainInsight) post += `- ${trunc(mainInsight, 140)}\n`;
+      if (supportInsight) post += `- ${trunc(supportInsight, 140)}\n\n`;
+      else post += `\n`;
+      post += `The shift wasn't about doing more. It was about knowing what actually matters.`;
+    } else if (tmpl && tmpl.name === 'Lesson Learned') {
+      if (dialogueLine) post += `"${trunc(dialogueLine, 180)}"\n\n`;
+      post += `I hear some version of this every week.\n\n`;
+      if (mainInsight) post += `${trunc(mainInsight, 250)}\n\n`;
+      post += `This is the kind of lesson you can't learn from a spreadsheet.\n\n`;
+      post += `You have to talk to real people. That's where the edge is.`;
+    } else {
+      // No template — freeform from transcript
+      post += `On a recent call, something came up that I think every investor needs to hear.\n\n`;
+      if (dialogueLine) post += `"${trunc(dialogueLine, 180)}"\n\n`;
+      if (mainInsight) post += `${trunc(mainInsight, 250)}\n\n`;
+      if (supportInsight) post += `${trunc(supportInsight, 200)}\n\n`;
+      post += `This is the kind of conversation that changes how you think about building a portfolio.`;
+    }
+  } else {
+    // No transcript content available — use template-only generation
+    if (tmpl && tmpl.name === 'Story Arc') {
+      post += `On a recent call, someone asked me a question I hear all the time.\n\n`;
+      post += `"How do I know if an operator is actually good?"\n\n`;
+      post += `Here's what I told them:\n\n`;
+      post += `Track record beats marketing. Every single time.\n\n`;
+      post += `The best operators I know don't need a flashy webinar.\n`;
+      post += `Their deal history speaks for itself.`;
+    } else if (tmpl && tmpl.name === 'Listicle') {
+      post += `1. Underwrite the deal yourself — don't rely on the sponsor's numbers.\n\n`;
+      post += `2. Talk to the property manager before you wire a dollar.\n\n`;
+      post += `3. Ask the operator what they'd do differently next time.\n\n`;
+      post += `4. Read the PPM cover to cover, especially the risk factors.\n\n`;
+      post += `5. Start with a smaller check. Learn the asset class with real skin in the game.\n\n`;
+      post += `Most investors skip these. Don't be most investors.`;
+    } else if (tmpl && tmpl.name === 'Hot Take') {
+      post += `Most people in this space won't say this out loud.\n\n`;
+      post += `But if you've been doing this long enough, you know it's true.\n\n`;
+      post += `The best deals don't come from a webinar or a Facebook group.\n\n`;
+      post += `They come from real conversations with real operators who have real track records.`;
+    } else if (tmpl && tmpl.name === 'Case Study') {
+      post += `We looked at the numbers. Solid on paper.\n`;
+      post += `We talked to the team. They knew the market.\n`;
+      post += `We walked the property. It matched the story.\n\n`;
+      post += `That's the process. No shortcuts.\n\n`;
+      post += `The result? A deal that performs exactly as projected — 12 months in.`;
+    } else if (tmpl && tmpl.name === 'Framework') {
+      post += `Step 1: Find the right operator (track record > marketing)\n`;
+      post += `Step 2: Underwrite it yourself (trust but verify)\n`;
+      post += `Step 3: Start small (learn with real money, not paper)\n\n`;
+      post += `Simple? Yes. Easy? No.\n\n`;
+      post += `But this is how you build a portfolio that actually cash flows.`;
+    } else if (tmpl && tmpl.name === 'Myth Buster') {
+      post += `It sounds right.\nIt looks right.\nEveryone repeats it.\n\n`;
+      post += `But it's wrong.\n\n`;
+      post += `You don't need a 100-unit portfolio to build wealth through real estate.\n`;
+      post += `You need the right deals, the right operators, and the patience to let compounding work.`;
+    } else if (tmpl && tmpl.name === 'Before/After') {
+      post += `Before:\n- Chasing every deal on a webinar\n- Analyzing 50 pitch decks a month\n- Paralyzed by too many options\n\n`;
+      post += `After:\n- 3 trusted operators on speed dial\n- One asset class I know inside and out\n- $10K/month in passive distributions\n\n`;
+      post += `The shift wasn't about doing more. It was about doing less — with more conviction.`;
+    } else if (tmpl && tmpl.name === 'Lesson Learned') {
+      post += `I learned this the hard way.\n\n`;
+      post += `Early on, I optimized for returns on paper.\n`;
+      post += `Now I optimize for the operator behind the deal.\n\n`;
+      post += `The numbers matter. But the person executing matters more.\n\n`;
+      post += `That one shift changed everything.`;
+    } else {
+      post += `The best deal I ever did wasn't the one with the highest projected return.\n\n`;
+      post += `It was the one where I trusted the operator completely.\n\n`;
+      post += `Track record. Transparency. Alignment.\n\n`;
+      post += `That's it. That's the framework.`;
+    }
+  }
+
+  // CTA ending
+  if (!skipCTA) {
+    post += `\n\n---\n\nIf you want a clear framework for this, grab the LP Starter Kit.\n\nLink in the comments.`;
+  }
+
+  // Determine CTA, value, and image for the highlights panel
+  const cta = skipCTA ? 'Question-based ending (no hard pitch)' : 'Download the free LP Starter Kit (link in comments)';
+  const value = hookPattern ? getValueForPattern(STATE.selectedHookPattern) : 'Unique perspective from real investor conversations';
+  const imageIdea = hookPattern ? hookPattern.image : 'Professional headshot or data visual that supports the narrative';
+
+  // Generate a post name from the hook
+  const postName = hook.split('\n')[0].replace(/["""]/g, '').substring(0, 80);
+
+  // Validate and clean up the post
+  post = validatePost(post);
+
+  // Generate the angle / point summary
+  const angle = generateAngle(insights, hookPattern, tmpl);
+
+  // Set fields
+  document.getElementById('composeTitle').value = postName;
+  document.getElementById('composeAngle').value = angle;
+  document.getElementById('composeBody').value = post;
+
+  // Show generated output
+  const output = document.getElementById('generatedOutput');
+  output.classList.add('visible');
+  document.getElementById('goCTA').textContent = cta;
+  document.getElementById('goValue').textContent = value;
+  document.getElementById('goImage').textContent = imageIdea;
+}
+
+function validatePost(post) {
+  // Clean up the generated post to ensure it reads well
+  let lines = post.split('\n');
+
+  lines = lines.map(l => {
+    // Clean leftover speech artifacts and doubled words
+    return l
+      .replace(/\b(um|uh)\b/gi, '')
+      .replace(/\b(\w+)\s+\1\b/gi, '$1') // fix doubled words: "the the" → "the"
+      .replace(/,\s*,/g, ',')
+      .replace(/\s{2,}/g, ' ')
+      .replace(/^\s*,\s*/, '')
+      .trim();
+  });
+
+  // Remove duplicate or near-duplicate lines
+  const seen = new Set();
+  lines = lines.filter(l => {
+    const key = l.toLowerCase().replace(/[^a-z0-9]/g, '').substring(0, 60);
+    if (key.length < 5) return true; // keep blank lines and short dividers
+    if (seen.has(key)) return false;
+    seen.add(key);
+    return true;
+  });
+
+  // Remove lines that are clearly broken
+  lines = lines.filter(l => {
+    const trimmed = l.trim();
+    if (trimmed.length === 0) return true; // keep blank lines for spacing
+    if (trimmed === '---') return true;
+    // Remove lines starting with lowercase (unless after a blank line)
+    if (/^[a-z]/.test(trimmed) && trimmed.length < 60) return false;
+    // Remove lines with stuttering
+    if (/\b(\w+)\s+\1\b/i.test(trimmed)) return false;
+    // Remove lines that start with a comma
+    if (/^,/.test(trimmed)) return false;
+    // Remove incomplete fragments ending in conjunctions
+    if (/\b(and|but|so|or)\s*$/i.test(trimmed) && trimmed.length < 80) return false;
+    return true;
+  });
+
+  // Clean up excess blank lines (max 2 consecutive)
+  let result = '';
+  let blankCount = 0;
+  for (const line of lines) {
+    if (line.trim() === '') {
+      blankCount++;
+      if (blankCount <= 2) result += '\n';
+    } else {
+      blankCount = 0;
+      result += line + '\n';
+    }
+  }
+
+  return result.trim();
+}
+
+function generateAngle(insights, hookPattern, tmpl) {
+  // Generate a 1-line angle/thesis for the post
+  if (insights.hasContent && insights.summaries.length) {
+    // Extract the core point from the first summary
+    const s = insights.summaries[0];
+    // Truncate to a punchy angle
+    const firstSentence = s.split(/[.!]/)[0];
+    if (firstSentence.length > 30 && firstSentence.length < 150) return firstSentence;
+    return s.substring(0, 120).replace(/,?\s*\w*$/, '');
+  }
+  if (insights.hasContent && insights.topWords.length) {
+    const words = insights.topWords.slice(0, 5).join(', ');
+    return `Key themes: ${words}`;
+  }
+  if (hookPattern) return hookPattern.examples[0].split('\n')[0].substring(0, 100);
+  if (tmpl) return `${tmpl.name} format post`;
+  return '';
+}
+
+function getValueForPattern(pattern) {
+  const map = {
+    'dream-math': 'Concrete math that makes the reader believe this is achievable for them',
+    'pain-gap': 'Reader feels seen — you named their exact situation without shaming them',
+    'specific-person': 'Story-driven proof that builds trust through a real person\'s experience',
+    'confession': 'Vulnerability + credibility. You\'ve been in the arena and learned from it',
+    'big-scary': 'Pattern interrupt that creates tension and positions you as the sober voice',
+    'comparison': 'Forces the reader to make a choice — reveals their default might be wrong',
+    'most-vs-best': 'Positions reader on the "serious investor" side. Identity upgrade',
+    'lie-reframe': 'Intrigue + frames you as the nuanced, contrarian expert',
+    'scene-feeling': 'Emotional connection before they realize it\'s about investing',
+    'list-secrets': 'Scannable, high-save content. Feels complete and actionable',
+    'student-question': 'Relatable — they\'ve had the same question. Feels like coaching',
+  };
+  return map[pattern] || 'Unique perspective from real investor conversations';
+}
+
+function insertSnippet() {
+  if (!STATE.selectedTranscript) return;
+  const text = STATE.selectedTranscript.fields['Transcript'] || fieldStr(STATE.selectedTranscript.fields, 'Description') || '';
+  const ta = document.getElementById('composeBody');
+  ta.value += '\n\n---\nFrom transcript:\n"' + text.substring(0, 500) + '"';
+  ta.focus();
+}
+
+function updateKPIs(records) {
+  const doneCount = records.filter(r => {
+    const status = fieldStr(r.fields, 'Copy Status').toLowerCase();
+    return status.includes('done');
+  }).length;
+  document.getElementById('kpi-posts').textContent = doneCount;
+}
+
+// ═══════════════════════════════════════
+// SWIPE FILE
+// ═══════════════════════════════════════
+function getDefaultSwipe() {
+  return [
+    {
+      author: 'Sahil Bloom',
+      handle: '@SahilBloom',
+      text: 'The most powerful framework I\'ve found for building wealth: Make money → Save money → Invest money → Make money from investments → Reinvest. This simple loop, repeated for 10+ years, is how every wealthy person I know got there.',
+      tags: ['framework', 'wealth', 'simplicity'],
+      pinned: true,
+    },
+    {
+      author: 'Chris Walker',
+      handle: '@chris_walker',
+      text: 'Nobody wants another course. They want a clear path from where they are to where they want to be. The companies winning right now are the ones that sell clarity, not content.',
+      tags: ['positioning', 'clarity', 'offer'],
+      pinned: true,
+    },
+    {
+      author: 'Alex Hormozi',
+      handle: '@AlexHormozi',
+      text: 'The number one reason people don\'t buy: they don\'t believe it will work for them specifically. Your marketing job isn\'t to be clever. It\'s to show proof for their exact situation.',
+      tags: ['proof', 'social-proof', 'specificity'],
+      pinned: false,
+    },
+  ];
+}
+
+function renderSwipeFile() {
+  const grid = document.getElementById('swipeGrid');
+  let html = '';
+  STATE.swipeFile.forEach((post, i) => {
+    html += `<div class="swipe-card">
+      <button class="pin-btn ${post.pinned ? 'pinned' : ''}" onclick="togglePin(${i})">${post.pinned ? '📌' : '📍'}</button>
+      <div class="author">${post.author}</div>
+      <div class="author-handle">${post.handle}</div>
+      <div class="swipe-text">${post.text}</div>
+      <div class="swipe-tags">
+        ${post.tags.map(t => `<span class="swipe-tag">${t}</span>`).join('')}
+      </div>
+    </div>`;
+  });
+  grid.innerHTML = html;
+
+}
+
+function togglePin(idx) {
+  STATE.swipeFile[idx].pinned = !STATE.swipeFile[idx].pinned;
+  localStorage.setItem('gyc_swipe', JSON.stringify(STATE.swipeFile));
+  renderSwipeFile();
+  renderStylePicker();
+}
+
+function showAddSwipe() { document.getElementById('swipeModal').classList.add('show'); }
+function hideModal(id) { document.getElementById(id).classList.remove('show'); }
+
+function addSwipePost() {
+  const post = {
+    author: document.getElementById('swipeAuthor').value.trim(),
+    handle: document.getElementById('swipeHandle').value.trim(),
+    text: document.getElementById('swipeText').value.trim(),
+    tags: document.getElementById('swipeTags').value.split(',').map(t => t.trim()).filter(Boolean),
+    url: document.getElementById('swipeUrl').value.trim(),
+    pinned: false,
+  };
+  if (!post.author || !post.text) return;
+  STATE.swipeFile.unshift(post);
+  localStorage.setItem('gyc_swipe', JSON.stringify(STATE.swipeFile));
+  renderSwipeFile();
+  renderStylePicker();
+  hideModal('swipeModal');
+  // Clear form
+  ['swipeAuthor','swipeHandle','swipeText','swipeTags','swipeUrl'].forEach(id =>
+    document.getElementById(id).value = '');
+}
+
+// ═══════════════════════════════════════
+// COMPOSE HELPERS
+// ═══════════════════════════════════════
+function insertBrandVoice() {
+  const ta = document.getElementById('composeBody');
+  const text = ta.value;
+  let warnings = [];
+  if (/\b(FINANCIAL FREEDOM|10X|🚀|🔥|!!!)\b/i.test(text)) warnings.push('Hype language detected — tone it down');
+  if (/\b(proprietary|algorithmic|leverage)\b/i.test(text)) warnings.push('Jargon detected — simplify');
+  if (/limited time|spots run out|don\'t miss/i.test(text)) warnings.push('Urgency/scarcity language — not on-brand');
+  if (!/\d/.test(text)) warnings.push('No concrete numbers — add proof points');
+  if (text.length < 50) warnings.push('Post seems short — aim for substance');
+  if (!warnings.length) warnings.push('Looks on-brand! Confident, direct, editorial tone.');
+  alert('Brand Voice Check:\n\n' + warnings.map(w => '• ' + w).join('\n'));
+}
+
+function insertCTA() {
+  const ta = document.getElementById('composeBody');
+  ta.value += '\n\n---\n\n→ Download the free LP Starter Kit (link in comments)';
+  ta.focus();
+}
+
+function insertDisclaimer() {
+  const ta = document.getElementById('composeBody');
+  ta.value += '\n\n---\nGrow Your Cashflow LLC does not provide tax, legal, or accounting advice. Consult your own advisors before any transaction.';
+  ta.focus();
+}
+
+async function savePost() {
+  if (!STATE.config.airtableKey || !STATE.config.airtableBase) {
+    alert('Connect Airtable first (enter API key in sidebar)');
+    return;
+  }
+  const title = document.getElementById('composeTitle').value.trim();
+  const body = document.getElementById('composeBody').value.trim();
+  const type = document.getElementById('composeType').value;
+  if (!title) { alert('Add a title first'); return; }
+
+  try {
+    const tableName = STATE.tableName || localStorage.getItem('gyc_tableName') || 'Content';
+    const resp = await fetch(`https://api.airtable.com/v0/${STATE.config.airtableBase}/${encodeURIComponent(tableName)}`, {
+      method: 'POST',
+      headers: {
+        'Authorization': `Bearer ${STATE.config.airtableKey}`,
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({
+        records: [{
+          fields: {
+            'Description': title,
+            'Content Type': type,
+            'Production Status': 'Script',
+            'Copy Editor': 'Pascal Wagner',
+          }
+        }]
+      })
+    });
+    if (!resp.ok) throw new Error(`Airtable ${resp.status}`);
+    alert('Post saved to Airtable!');
+    document.getElementById('composeTitle').value = '';
+    document.getElementById('composeBody').value = '';
+    loadContent();
+  } catch (e) {
+    alert('Failed to save: ' + e.message);
+  }
+}
+
+function openInAirtable(recordId) {
+  const base = STATE.config.airtableBase || 'appVkAbxdZf4Tp64R';
+  window.open(`https://airtable.com/${base}`, '_blank');
+}
+
+// ═══════════════════════════════════════
+// CHARTS
+// ═══════════════════════════════════════
+function initCharts() {
+  Chart.defaults.font.family = "'Plus Jakarta Sans', sans-serif";
+  Chart.defaults.font.size = 11;
+  Chart.defaults.color = '#607179';
+
+  // Content Output chart
+  new Chart(document.getElementById('chartContentOutput'), {
+    type: 'bar',
+    data: {
+      labels: ['W1', 'W2', 'W3', 'W4', 'W5', 'W6', 'W7', 'W8'],
+      datasets: [{
+        label: 'LinkedIn',
+        data: [5, 4, 6, 5, 7, 4, 6, 3],
+        backgroundColor: '#51BE7B',
+        borderRadius: 4,
+      }, {
+        label: 'YouTube',
+        data: [1, 1, 2, 1, 1, 2, 1, 1],
+        backgroundColor: '#1F5159',
+        borderRadius: 4,
+      }, {
+        label: 'Newsletter',
+        data: [1, 1, 1, 1, 1, 1, 1, 0],
+        backgroundColor: '#40E47F',
+        borderRadius: 4,
+      }]
+    },
+    options: {
+      responsive: true, maintainAspectRatio: false,
+      plugins: { legend: { position: 'bottom', labels: { boxWidth: 12, padding: 16 } } },
+      scales: { x: { stacked: true, grid: { display: false } }, y: { stacked: true, beginAtZero: true, grid: { color: '#eee' } } },
+    }
+  });
+
+  // Funnel chart
+  new Chart(document.getElementById('chartFunnel'), {
+    type: 'bar',
+    data: {
+      labels: ['Impressions', 'Profile Views', 'LP Visits', 'Opt-ins', 'Calls', 'Sales'],
+      datasets: [{
+        data: [27000, 516, 254, 52, 14, 4],
+        backgroundColor: ['#0A1E21', '#1F5159', '#32C583', '#51BE7B', '#40E47F', '#51BE7B'],
+        borderRadius: 4,
+      }]
+    },
+    options: {
+      indexAxis: 'y',
+      responsive: true, maintainAspectRatio: false,
+      plugins: { legend: { display: false } },
+      scales: { x: { type: 'logarithmic', grid: { color: '#eee' } }, y: { grid: { display: false } } },
+    }
+  });
+
+  // LinkedIn impressions
+  new Chart(document.getElementById('chartLI'), {
+    type: 'line',
+    data: {
+      labels: ['W1', 'W2', 'W3', 'W4', 'W5', 'W6', 'W7', 'W8'],
+      datasets: [{
+        label: 'Impressions',
+        data: [1088, 1847, 1723, 1636, 1796, 1627, 1386, 2742],
+        borderColor: '#51BE7B',
+        backgroundColor: 'rgba(81,190,123,0.1)',
+        fill: true,
+        tension: 0.3,
+      }]
+    },
+    options: {
+      responsive: true, maintainAspectRatio: false,
+      plugins: { legend: { display: false } },
+      scales: { x: { grid: { display: false } }, y: { beginAtZero: true, grid: { color: '#eee' } } },
+    }
+  });
+
+  // Facebook
+  new Chart(document.getElementById('chartFB'), {
+    type: 'line',
+    data: {
+      labels: ['W1', 'W2', 'W3', 'W4', 'W5', 'W6', 'W7', 'W8'],
+      datasets: [{
+        label: 'Reach',
+        data: [4, 12, 3, 4, 1, 1, 3, 5],
+        borderColor: '#1F5159',
+        backgroundColor: 'rgba(31,81,89,0.1)',
+        fill: true,
+        tension: 0.3,
+      }]
+    },
+    options: {
+      responsive: true, maintainAspectRatio: false,
+      plugins: { legend: { display: false } },
+      scales: { x: { grid: { display: false } }, y: { beginAtZero: true, grid: { color: '#eee' } } },
+    }
+  });
+
+  // Subscribers
+  new Chart(document.getElementById('chartSubs'), {
+    type: 'line',
+    data: {
+      labels: ['Oct', 'Nov', 'Dec', 'Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep'],
+      datasets: [{
+        label: 'New Subs',
+        data: [43, 51, 19, 28, 36, 74, 39, 141, 53, 58, 91, 125],
+        borderColor: '#51BE7B',
+        backgroundColor: 'rgba(81,190,123,0.15)',
+        fill: true,
+        tension: 0.3,
+      }]
+    },
+    options: {
+      responsive: true, maintainAspectRatio: false,
+      plugins: { legend: { display: false } },
+      scales: { x: { grid: { display: false } }, y: { beginAtZero: true, grid: { color: '#eee' } } },
+    }
+  });
+
+  // Revenue
+  new Chart(document.getElementById('chartRevenue'), {
+    type: 'bar',
+    data: {
+      labels: ['Oct', 'Nov', 'Dec', 'Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep'],
+      datasets: [{
+        label: 'Revenue',
+        data: [1400, 1200, 5800, 4100, 6000, 1900, 3800, 14600, 4100, 7700, 6800, 7800],
+        backgroundColor: '#51BE7B',
+        borderRadius: 4,
+      }]
+    },
+    options: {
+      responsive: true, maintainAspectRatio: false,
+      plugins: { legend: { display: false } },
+      scales: { x: { grid: { display: false } }, y: { beginAtZero: true, grid: { color: '#eee' }, ticks: { callback: v => '$' + (v/1000).toFixed(0) + 'K' } } },
+    }
+  });
+
+  // Populate forecaster with data from screenshot
+  populateForecaster();
+}
+
+function populateForecaster() {
+  const data = [
+    { metric: 'New Email Subscribers', values: [43, 51, 19, 28, 36, 74] },
+    { metric: 'LinkedIn Posts/Month', values: [24, 42, 25, 14, 24, 23] },
+    { metric: 'Avg Impressions/Post', values: [1088, 1847, 1723, 1636, 1796, 1627] },
+    { metric: 'LI Total Impressions', values: [27169, 54725, 13897, 49374, 49639, 30577] },
+    { metric: 'LI Profile Views', values: [516, 633, 577, 644, 866, 498] },
+    { metric: 'LP Visits (Starter Kit)', values: [254, 169, 131, 89, 160, 137] },
+    { metric: 'Landing Page Opt-Ins', values: [52, 54, 46, 29, 52, 47] },
+    { metric: 'Scheduled Calls', values: [4, 1, 3, 5, 1, 7] },
+    { metric: 'Completed Calls', values: [1, 2, 4, 3, 4, 14] },
+    { metric: 'Total Revenue', values: ['$1.4K', '$1.2K', '$5.8K', '$4.1K', '$6.0K', '$1.9K'] },
+  ];
+
+  const tbody = document.getElementById('forecasterBody');
+  tbody.innerHTML = data.map(row =>
+    `<tr><td style="font-weight:600;">${row.metric}</td>${row.values.map(v => `<td>${v}</td>`).join('')}</tr>`
+  ).join('');
+}
+
+// Populate funnel from forecaster data
+function populateFunnel() {
+  // Using approximate Mar '25 numbers from the forecaster screenshot
+  const vals = { impressions: 30577, profile: 498, lp: 137, optins: 47, calls: 7, sales: 4 };
+  document.getElementById('f-impressions').textContent = vals.impressions.toLocaleString();
+  document.getElementById('f-profile').textContent = vals.profile.toLocaleString();
+  document.getElementById('f-profile-rate').textContent = ((vals.profile/vals.impressions)*100).toFixed(1) + '% CTR';
+  document.getElementById('f-lp').textContent = vals.lp.toLocaleString();
+  document.getElementById('f-lp-rate').textContent = ((vals.lp/vals.profile)*100).toFixed(1) + '% visit rate';
+  document.getElementById('f-optins').textContent = vals.optins;
+  document.getElementById('f-optins-rate').textContent = ((vals.optins/vals.lp)*100).toFixed(1) + '% opt-in';
+  document.getElementById('f-calls').textContent = vals.calls;
+  document.getElementById('f-calls-rate').textContent = ((vals.calls/vals.optins)*100).toFixed(1) + '% book rate';
+  document.getElementById('f-sales').textContent = vals.sales;
+  document.getElementById('f-sales-rate').textContent = ((vals.sales/vals.calls)*100).toFixed(1) + '% close rate';
+
+  // Overview KPIs from forecaster
+  document.getElementById('kpi-li-impressions').textContent = '30.6K';
+  document.getElementById('kpi-li-views').textContent = '498';
+  document.getElementById('kpi-lp-visits').textContent = '137';
+  document.getElementById('kpi-calls').textContent = '7';
+}
+
+// ═══════════════════════════════════════
+// PIPELINE FILTERS
+// ═══════════════════════════════════════
+document.getElementById('pipelineFilter').addEventListener('change', () => renderPipeline(STATE.airtableRecords));
+document.getElementById('pipelineType').addEventListener('change', () => renderPipeline(STATE.airtableRecords));
+
+// ═══════════════════════════════════════
+// REFRESH
+// ═══════════════════════════════════════
+async function refreshAll() {
+  updateConnectionStatus();
+  const fb = document.getElementById('syncFeedback');
+  try {
+    fb.style.color = 'rgba(255,255,255,0.5)';
+    fb.textContent = 'Loading content...';
+    await Promise.all([loadContent(), fetchGHLContacts()]);
+    const count = STATE.airtableRecords.length;
+    if (count > 0) {
+      fb.style.color = 'var(--green-accent)';
+      fb.textContent = `✓ Loaded ${count} records`;
+    }
+  } catch(e) {
+    fb.style.color = '#ff6b6b';
+    fb.textContent = '✗ ' + e.message;
+    console.error('Refresh error:', e);
+  }
+}
+
+// ═══════════════════════════════════════
+// INIT
+// ═══════════════════════════════════════
+document.addEventListener('DOMContentLoaded', () => {
+  // Set date
+  const now = new Date();
+  document.getElementById('dateDisplay').textContent = now.toLocaleDateString('en-US', { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' });
+
+  // Restore config
+  if (STATE.config.airtableKey) document.getElementById('airtableKey').value = STATE.config.airtableKey;
+  if (STATE.config.airtableBase) document.getElementById('airtableBase').value = STATE.config.airtableBase;
+  if (STATE.config.ghlKey) document.getElementById('ghlKey').value = STATE.config.ghlKey;
+  if (STATE.config.ghlLocation) document.getElementById('ghlLocation').value = STATE.config.ghlLocation;
+
+  updateConnectionStatus();
+  initCharts();
+  populateFunnel();
+  renderSwipeFile();
+  renderStylePicker();
+  renderTranscripts();
+
+  // Auto-load if keys present
+  if (STATE.config.airtableKey) refreshAll();
+});
+</script>
+</body>
+</html>
